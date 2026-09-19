@@ -1,11 +1,35 @@
-# VLM Probing
+<p align="center">
+  <img src="docs/assets/vlm-probing-icon.svg" width="112" alt="VLM Probing icon">
+</p>
 
-A PyTorch library for inspecting and intervening in vision-language models.
-Bind your model once, then use **lens**, **attention**, and **causal** methods
-through a shared `.run(inputs)` interface.
+<h1 align="center">VLM Probing</h1>
 
-VLM Probing provides 18 methods, automatic adapters for seven VLM families, and
-an explicit adapter interface for custom models.
+<p align="center">
+  <strong>A model-aware toolkit for inspecting and intervening in vision-language models.</strong>
+</p>
+
+Modern VLMs expose hidden states and attention tensors, but turning those tensors
+into a valid experiment still requires architecture-specific knowledge: where
+visual tokens enter the language model, which residual state a layer index names,
+whether an attention tensor is editable, and how an intermediate state reaches
+the vocabulary. VLM Probing puts these details behind explicit, tested adapters.
+
+Bind a model once, inspect its capabilities, and ask three kinds of questions
+through one consistent `.run(inputs)` interface:
+
+- **What is represented?** Decode layers, heads, and visual tokens with lens methods.
+- **Where does information flow?** Measure attention patterns and cross-token paths.
+- **What changes the answer?** Patch, ablate, attribute, or steer internal states.
+
+The library currently provides 18 methods and automatic adapters for seven VLM
+families. Every result preserves layer and token coordinates, experiment metadata,
+and the distinction between observational readouts and causal interventions.
+Models outside the built-in set can be connected through the same explicit
+adapter contract.
+
+<p align="center">
+  <img src="docs/assets/library-overview.svg" width="100%" alt="VLM Probing library overview: a model is bound through Prober and an explicit adapter, then analyzed with lens, attention, and causal methods.">
+</p>
 
 [Documentation](docs/README.md) · [Models](docs/models/README.md) ·
 [Methods](docs/methods/README.md) · [Papers](docs/REFERENCES.md)

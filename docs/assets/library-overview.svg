@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 700" role="img" aria-labelledby="title desc">
+  <title id="title">VLM Probing library overview</title>
+  <desc id="desc">A vision-language model is bound through Prober and an explicit model adapter, then inspected with lens, attention, and causal methods, producing structured probe results.</desc>
+  <defs>
+    <linearGradient id="canvas" x1="0" y1="0" x2="1440" y2="700" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8FBFF"/><stop offset="1" stop-color="#F4F1FF"/>
+    </linearGradient>
+    <linearGradient id="core" x1="380" y1="148" x2="706" y2="548" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#122642"/><stop offset="1" stop-color="#0B1630"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="370" y1="120" x2="1080" y2="590" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#17BEBB"/><stop offset=".5" stop-color="#4C8DF6"/><stop offset="1" stop-color="#8259E8"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-25%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#183457" flood-opacity=".12"/>
+    </filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8.2" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0 0L10 5L0 10Z" fill="#7183A0"/>
+    </marker>
+    <style>
+      text { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .title { font-size: 34px; font-weight: 750; fill: #10213B; }
+      .subtitle { font-size: 17px; fill: #62708A; }
+      .heading { font-size: 22px; font-weight: 700; fill: #10213B; }
+      .body { font-size: 16px; fill: #53627A; }
+      .small { font-size: 14px; fill: #697991; }
+      .coreHeading { font-size: 25px; font-weight: 750; fill: #F5FAFF; }
+      .coreBody { font-size: 15px; fill: #BFD0E7; }
+      .family { font-size: 20px; font-weight: 720; fill: #10213B; }
+      .method { font-size: 14px; fill: #5C6A82; }
+    </style>
+  </defs>
+
+  <rect width="1440" height="700" rx="32" fill="url(#canvas)"/>
+  <path d="M0 605C246 518 392 695 659 616C891 548 1048 474 1440 588V700H0Z" fill="#E9F3FF" opacity=".52"/>
+  <circle cx="1335" cy="90" r="170" fill="#EAE2FF" opacity=".42"/>
+
+  <text x="56" y="62" class="title">One model-bound interface for mechanistic VLM experiments</text>
+  <text x="56" y="92" class="subtitle">Architecture-aware capture, decoding, attention analysis, and causal intervention</text>
+
+  <!-- Model input -->
+  <g filter="url(#shadow)">
+    <rect x="54" y="178" width="260" height="338" rx="24" fill="#FFFFFF" stroke="#DCE5F1" stroke-width="2"/>
+  </g>
+  <rect x="78" y="204" width="212" height="128" rx="16" fill="#EBF6FF"/>
+  <circle cx="234" cy="244" r="20" fill="#FFD270"/>
+  <path d="M78 302L130 257L169 289L207 252L290 321V332H78Z" fill="#4BC6B9"/>
+  <path d="M78 319L145 280L184 308L226 271L290 312V332H78Z" fill="#407EEB" opacity=".78"/>
+  <text x="78" y="372" class="heading">Your VLM</text>
+  <text x="78" y="403" class="body">Image + prompt</text>
+  <g fill="#E9EEF6">
+    <rect x="78" y="431" width="35" height="35" rx="9"/><rect x="121" y="431" width="35" height="35" rx="9"/>
+    <rect x="164" y="431" width="35" height="35" rx="9"/><rect x="207" y="431" width="35" height="35" rx="9"/>
+  </g>
+  <g fill="#39C8BE">
+    <rect x="83" y="436" width="25" height="25" rx="6"/><rect x="126" y="436" width="25" height="25" rx="6" opacity=".8"/>
+  </g>
+  <text x="78" y="493" class="small">Native processor inputs</text>
+
+  <!-- Connection to core -->
+  <path d="M314 347H374" fill="none" stroke="#7183A0" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <!-- Prober core -->
+  <rect x="394" y="148" width="314" height="400" rx="28" fill="#0D1C36" stroke="#253D60" stroke-width="2"/>
+  <rect x="422" y="178" width="258" height="70" rx="17" fill="#192F50" stroke="#355478"/>
+  <circle cx="458" cy="213" r="17" fill="none" stroke="#58D9CF" stroke-width="5"/>
+  <path d="M470 225L484 239" stroke="#58D9CF" stroke-width="7" stroke-linecap="round"/>
+  <text x="508" y="208" class="coreHeading">Prober</text>
+  <text x="508" y="231" class="coreBody">bind once · configure · run</text>
+
+  <text x="422" y="291" class="coreHeading">Explicit Model Adapter</text>
+  <text x="422" y="322" class="coreBody">Residual and head sites</text>
+  <text x="422" y="348" class="coreBody">Expanded visual-token layout</text>
+  <text x="422" y="374" class="coreBody">Readout and edit capabilities</text>
+  <line x1="422" y1="403" x2="680" y2="403" stroke="#2C4567"/>
+  <g>
+    <rect x="422" y="430" width="76" height="34" rx="17" fill="#183F52"/><text x="460" y="452" text-anchor="middle" font-size="13" fill="#72E3D7">capture</text>
+    <rect x="507" y="430" width="76" height="34" rx="17" fill="#19375D"/><text x="545" y="452" text-anchor="middle" font-size="13" fill="#8FC0FF">align</text>
+    <rect x="592" y="430" width="88" height="34" rx="17" fill="#342B5E"/><text x="636" y="452" text-anchor="middle" font-size="13" fill="#C0AFFF">intervene</text>
+  </g>
+  <text x="422" y="503" class="coreBody">probe.describe() checks support first</text>
+
+  <!-- Branches -->
+  <path d="M708 267H755V193H786" fill="none" stroke="#7183A0" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M708 348H786" fill="none" stroke="#7183A0" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M708 429H755V503H786" fill="none" stroke="#7183A0" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <!-- Families -->
+  <g filter="url(#shadow)">
+    <rect x="800" y="128" width="302" height="142" rx="22" fill="#FFFFFF" stroke="#CFEDE9" stroke-width="2"/>
+    <rect x="800" y="287" width="302" height="142" rx="22" fill="#FFFFFF" stroke="#D3E3FA" stroke-width="2"/>
+    <rect x="800" y="446" width="302" height="142" rx="22" fill="#FFFFFF" stroke="#E1D8F8" stroke-width="2"/>
+  </g>
+  <rect x="824" y="154" width="46" height="46" rx="13" fill="#E4FAF7"/>
+  <circle cx="847" cy="177" r="13" fill="none" stroke="#17BEBB" stroke-width="4"/>
+  <circle cx="847" cy="177" r="4" fill="#17BEBB"/>
+  <text x="887" y="178" class="family">Lens methods</text>
+  <text x="824" y="225" class="method">Logit · Tuned · Attention · Jacobian</text>
+  <text x="824" y="248" class="method">EmbedLens · Patchscope</text>
+
+  <rect x="824" y="313" width="46" height="46" rx="13" fill="#EAF2FF"/>
+  <path d="M834 349L843 336L852 343L862 326" fill="none" stroke="#4C8DF6" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="887" y="337" class="family">Attention methods</text>
+  <text x="824" y="384" class="method">Profile · Rollout · Relevance</text>
+  <text x="824" y="407" class="method">Head logits · Reweight · Temperature</text>
+
+  <rect x="824" y="472" width="46" height="46" rx="13" fill="#F2ECFF"/>
+  <path d="M835 506L847 482L859 506M840 497H854" fill="none" stroke="#8259E8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="887" y="496" class="family">Causal methods</text>
+  <text x="824" y="543" class="method">Patching · Ablation · Attribution</text>
+  <text x="824" y="566" class="method">Knockout · EAP-IG · Steering</text>
+
+  <!-- Results -->
+  <path d="M1102 348H1152" fill="none" stroke="#7183A0" stroke-width="3" marker-end="url(#arrow)"/>
+  <g filter="url(#shadow)">
+    <rect x="1170" y="211" width="216" height="274" rx="24" fill="#FFFFFF" stroke="#DCE5F1" stroke-width="2"/>
+  </g>
+  <rect x="1194" y="237" width="168" height="58" rx="14" fill="#F0F5FC"/>
+  <path d="M1212 276L1236 256L1257 268L1282 246L1311 264L1341 247" fill="none" stroke="url(#accent)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="1194" y="336" class="heading">ProbeResult</text>
+  <text x="1194" y="370" class="body">Tensors + coordinates</text>
+  <text x="1194" y="398" class="body">Method metadata</text>
+  <text x="1194" y="426" class="body">Portable save format</text>
+  <rect x="1194" y="445" width="116" height="25" rx="12.5" fill="#EAF7F6"/>
+  <text x="1252" y="462" text-anchor="middle" font-size="12" fill="#168E8B">reproducible</text>
+
+  <text x="720" y="656" text-anchor="middle" class="subtitle">The same run interface; capabilities remain explicit for every architecture.</text>
+</svg>
