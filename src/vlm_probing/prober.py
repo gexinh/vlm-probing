@@ -75,6 +75,11 @@ class Prober:
         residual = sorted(s.residuals)
         readout = getattr(self.adapter, "readout", None) is not None
         methods = {}
+        propagation = []
+        for i in range(max(s.residuals) + 1):
+            if i not in s.attentions:
+                break
+            propagation.append(i)
         rules = {
             "lens.logit": (residual if readout else [], "residual sites and model readout"),
             "lens.tuned": (residual if readout else [], "residual sites and model readout"),
@@ -83,8 +88,8 @@ class Prober:
             "lens.attention": (sorted(s.heads) if s.input_embeddings is not None else [], "projected heads and vocabulary dimensions"),
             "lens.patchscope": (residual, "residual sites"),
             "attention.profile": (sorted(s.attentions), "observable attention probabilities"),
-            "attention.rollout": (sorted(s.attentions), "observable self-attention probabilities"),
-            "attention.relevance": (sorted(s.attentions), "differentiable self-attention probabilities"),
+            "attention.rollout": (propagation, "observable self-attention at consecutive layers from 0"),
+            "attention.relevance": (propagation, "differentiable self-attention at consecutive layers from 0"),
             "attention.head_logits": (sorted(s.heads) if s.linear_readout else [], "projected heads and fixed-scale readout"),
             "attention.reweight": (sorted(s.editable_attention), "editable probabilities before A @ V"),
             "attention.temperature": (sorted(s.attention_scores), "editable masked attention logits"),

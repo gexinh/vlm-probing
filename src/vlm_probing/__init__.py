@@ -8,7 +8,7 @@ from .api.attention import AttentionMethods
 from .api.causal import CausalMethods
 from .metrics import TokenMargin, SequenceLogProb
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 __all__ = ["BaseMethod", "ProbeResult", "ForwardTrace", "BaseModelAdapter",
            "HookPoint", "ModelReadout", "TorchModelAdapter", "Prober", "ModelSpec",
            "ProbeInputs", "TokenLayout", "CapabilityError", "register_adapter",

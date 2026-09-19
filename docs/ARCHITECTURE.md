@@ -1,72 +1,67 @@
-# Architecture: v0.2.0
+# Package Architecture
 
-The library separates algorithm computation from model-specific execution and
-user-facing experiment configuration.
+[Home](../README.md) / [Documentation](README.md)
+
+The package separates a convenient model-bound API from reusable algorithms and
+explicit model contracts.
 
 ```text
-user's model + processor
-          │
-          ▼
-Prober ── LensMethods / AttentionMethods / CausalMethods
-          │ configure a bound method, then run(inputs)
-          ▼
-adapter + ModelSpec ── capture / token layout / actual model interventions
-          │
-          ▼
-BaseMethod → BaseLens / BaseAttention / BaseCausal → concrete tensor algorithm
-          │
-          ▼
-ProbeResult: detached tensors + positions/layers/configuration metadata
+Prober(model, processor)
+    ├── LensMethods       → configured lens → run(inputs)
+    ├── AttentionMethods  → configured probe → run(inputs)
+    └── CausalMethods     → configured intervention → run(inputs)
+                  │
+          adapter + ModelSpec
+          capture / layout / intervention / readout
+                  │
+          concrete tensor algorithm
+                  │
+          ProbeResult(tensors, metadata)
 ```
 
-## Responsibilities
+## Class hierarchy
 
-- `prober.py` binds an existing model, resolves an adapter, prepares processor
-  inputs, and reports capabilities without inference.
-- `api/lenses.py`, `api/attention.py`, and `api/causal.py` expose the three method
-  collections. Small bound executors capture inputs, call the original algorithms,
-  replay actual interventions, and aggregate results. Shared scoring, alignment,
-  evaluation-mode handling, and serialization metadata are in `api/common.py`.
-- `adapters/spec.py` declares sequence semantics and available sites. `torch.py`
-  implements scoped hooks, restores mixed train/eval flags, and rejects missing,
-  repeated, or mutated captures. `auto.py` uses explicit registration/protocols;
-  `huggingface.py` handles two version-gated, tested architectures.
-- `lenses/`, `attention/`, and `causal/` retain their original family base classes
-  and six concrete algorithms each. They remain independently usable. No second
-  copy of an algorithm is embedded in the public facade.
-- `metrics.py` supplies token margins and correctly shifted teacher-forced answer
-  log probabilities. Public metric objects receive resolved token metadata.
+```mermaid
+classDiagram
+    BaseMethod <|-- BaseLens
+    BaseMethod <|-- BaseAttention
+    BaseMethod <|-- BaseCausal
+    BaseLens <|-- LogitLens
+    BaseLens <|-- TunedLens
+    BaseAttention <|-- AttentionProfile
+    BaseAttention <|-- AttentionRollout
+    BaseCausal <|-- ActivationPatching
+    BaseCausal <|-- Ablation
+    Prober *-- LensMethods
+    Prober *-- AttentionMethods
+    Prober *-- CausalMethods
+    Prober o-- TorchModelAdapter
+```
 
-The facade uses composition. This preserves the existing inheritance contracts
-without adding a separate model-specific subclass for every algorithm/model pair.
-Only fitted methods own calibration state and expose fit/save/load.
+The diagram shows representative subclasses. Each algorithm family has six
+concrete subclasses, indexed in the [method guides](methods/README.md).
+The facade uses composition over this hierarchy, so new model support does not
+require another copy of every algorithm.
 
-## Execution contracts
+## Module responsibilities
 
-Lens factories select layers and tokens before execution. Captures come from a
-single model forward, and selected vectors are packed with explicit batch/token
-coordinates before vocabulary decoding. Fitted lenses hold separate state per
-layer, with checkpoint/site/readout/tokenizer/calibration identity validation.
+| Module | Responsibility |
+| --- | --- |
+| `prober.py` | Model binding, processor convenience, capability reports. |
+| `api/` | Configure methods, collect activations, score/replay edits, pack results. |
+| `adapters/spec.py` | Explicit residual/head/attention sites and expanded token semantics. |
+| `adapters/torch.py` | Scoped hooks, readout, state restoration, capture validation. |
+| `adapters/auto.py` | Exact-class registration and model-provided adapter protocol. |
+| `adapters/huggingface.py` | Shared execution with explicit contracts for seven VLM families and Llama. |
+| `lenses/`, `attention/`, `causal/` | Family base classes and tensor algorithm subclasses. |
+| `core/`, `metrics.py` | Shared results, traces, and output scoring. |
 
-Causal and attention-editing sweeps perform independent per-layer experiments.
-Source tensors and the receiver baseline are captured once; each edited forward
-starts from the original receiver inputs. Tensor replacement alone is never
-reported as a measured effect. Attribution methods retain a differentiable graph
-and never accumulate gradients into the caller's model parameters.
+Residual interventions run independently per layer. Propagation combines an
+unbroken prefix of attention layers; Qwen3.5's linear-attention gaps cannot be
+treated as missing-but-ignorable matrices. HF residual captures include
+Qwen3-VL's post-block DeepStack additions.
 
-Rollout/relevance instead combine consecutive layers in forward order. Head
-readout uses explicit per-head projection and full-residual normalization rules.
-A diagnostic attention output is never treated as an editable value-path input.
-
-## Deliberate boundaries
-
-The common interface is a full-sequence, single-model execution interface, not a
-scheduler, generation backend, model loader, or distributed training system.
-Model-dependent chat templates and custom layouts remain explicit. Unknown model
-architectures and missing capabilities fail with actionable errors.
-
-Built-in HF adapters were verified on small random models, including the actual
-Qwen2.5-VL vision path. Pretrained checkpoints, video, quantization, sharding,
-KV-cache generation, and native HF attention edits remain unvalidated/unsupported
-as documented in the README. See [adapter contracts](ADAPTERS.md),
-[API semantics](API.md), and [algorithm scope](METHODS.md).
+Adapters restore model training flags and remove their hooks after success or
+failure. Unknown architectures and missing intervention sites fail before use.
+See [adapter contracts](ADAPTERS.md), [the API](API.md), and
+[validation scope](releases/v0.3.0.md).

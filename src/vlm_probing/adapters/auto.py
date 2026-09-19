@@ -22,12 +22,8 @@ def auto_adapter(model):
     factory = getattr(model, "probing_adapter", None)
     if callable(factory):
         return factory()
-    known = {
-        ("transformers.models.llama.modeling_llama", "LlamaForCausalLM"),
-        ("transformers.models.qwen2_5_vl.modeling_qwen2_5_vl", "Qwen2_5_VLForConditionalGeneration"),
-    }
-    if (type(model).__module__, type(model).__name__) in known:
-        from .huggingface import make_adapter
+    from .huggingface import MODEL_CONTRACTS, make_adapter
+    if (type(model).__module__, type(model).__name__) in MODEL_CONTRACTS:
         return make_adapter(model)
     raise CapabilityError(
         f"No automatic adapter for {type(model).__name__}. Pass adapter=TorchModelAdapter(..., "

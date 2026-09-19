@@ -1,5 +1,7 @@
 # Model adapters
 
+[Home](../README.md) / [Documentation](README.md)
+
 The adapter owns model-specific execution. Algorithm classes remain independent
 of architecture paths. A public adapter supplies `model`, `model_id`, `readout`,
 `spec`, and `run`; `TorchModelAdapter` implements scoped module hooks and is the
@@ -81,7 +83,7 @@ does not claim attention or head access. The full demonstration contract is in
 
 | ModelSpec field | Contract |
 | --- | --- |
-| `residuals` | `{layer: site}`, raw residual block outputs, before the final readout norm |
+| `residuals` | `{layer: site}`, residuals after a block and any visual injection, before the next block/final norm |
 | `attentions` | `{layer: site}`, actual probabilities `[B,H,Q,K]`; observational unless declared editable |
 | `attention_scores` | `{layer: site}`, editable masked logits before softmax |
 | `editable_attention` | Layer indices whose probability site is consumed by `A @ V` after the hook |
@@ -122,12 +124,13 @@ assumed compatible. Alternatively implement `model.probing_adapter()` returning
 a configured adapter. Registration takes precedence over that protocol and the
 built-in HF adapters. `replace=True` explicitly replaces an existing registration.
 
-Built-in HF adapters are version-gated to Transformers 4.57.x and class-gated to
-LlamaForCausalLM and Qwen2_5_VLForConditionalGeneration. Their contracts follow the
-[official Llama implementation](https://github.com/huggingface/transformers/blob/v4.57.6/src/transformers/models/llama/modeling_llama.py)
-and [official Qwen2.5-VL implementation](https://github.com/huggingface/transformers/blob/v4.57.6/src/transformers/models/qwen2_5_vl/modeling_qwen2_5_vl.py).
-Use an explicit adapter for other versions/architectures; update tests before
-extending this list.
+Built-in HF adapters use explicit contracts for seven VLM families and Llama.
+See the [model matrix](models/README.md) for classes, versions, examples, and
+validation. Qwen3.5 linear-attention blocks have residual sites but no standard
+softmax attention/head sites. Qwen3-VL captures residuals after DeepStack visual
+injection. Unknown wrapper classes and unaudited composite text backbones are
+rejected. Use an explicit adapter for other contracts and update integration
+tests before registering another architecture.
 
 ## Integration checks
 

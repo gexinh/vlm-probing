@@ -104,11 +104,22 @@ class AttentionMethods:
                               queries=queries, groups=groups)
 
     def rollout(self, *, layers=None, head_reduction="mean", residual=True):
-        return AttentionProbe(self.probe, "rollout", layers_for(self.probe, layers, "attentions"),
+        return AttentionProbe(self.probe, "rollout", self._propagation_layers(layers),
                               head_reduction=head_reduction, residual=residual)
 
     def relevance(self, *, layers=None):
-        return AttentionProbe(self.probe, "relevance", layers_for(self.probe, layers, "attentions"))
+        return AttentionProbe(self.probe, "relevance", self._propagation_layers(layers))
+
+    def _propagation_layers(self, layers):
+        available = self.probe.describe()["methods"]["attention.rollout"]["sites"]
+        if not available:
+            raise CapabilityError("propagation requires attention layers starting at 0; "
+                                  "hybrid linear-attention gaps cannot be skipped")
+        chosen = layers_for(self.probe, available if layers is None else layers, "attentions")
+        if not chosen or chosen != list(range(chosen[-1] + 1)):
+            raise CapabilityError("propagation requires consecutive attention layers from 0; "
+                                  "hybrid linear-attention gaps cannot be skipped")
+        return chosen
 
     def head_logits(self, *, layers=None):
         require(self.probe.spec.linear_readout, "head attribution requires spec.linear_readout")
