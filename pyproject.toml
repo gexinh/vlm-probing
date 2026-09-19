@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vlm-probing"
+version = "0.2.0"
+description = "Model-bound lens, attention, and causal probes for vision-language models"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["torch>=2.2"]
+
+[project.optional-dependencies]
+transformers = ["transformers>=4.57,<4.58"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

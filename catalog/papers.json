@@ -1,0 +1,1046 @@
+{
+  "schema_version": 1,
+  "checked_on": "2026-09-17",
+  "scope": "18 user-supplied visual reasoning papers",
+  "runtime_experiments_performed": false,
+  "papers": [
+    {
+      "id": "mmvp_mof",
+      "title": "Eyes Wide Shut? Exploring the Visual Shortcomings of Multimodal LLMs",
+      "checked_on": "2026-09-17",
+      "supplied_venue": "CVPR 2024",
+      "verified_venue": "CVPR 2024",
+      "identity_status": "verified",
+      "paper_url": "https://arxiv.org/abs/2401.06209",
+      "repository_url": "https://github.com/tsb0601/MMVP",
+      "repository_revision": "763500597e65c3446f09047837ceda76f4e264bf",
+      "license": "README declares MIT; root LICENSE absent in inspected tree; vendored LLaVA/LICENSE is separate",
+      "license_status": "see_license_field_and_report",
+      "upstream_code_status": "source_inspected_not_executed",
+      "runtime_verified": false,
+      "local_implementation": "planned",
+      "classification": [
+        "benchmark",
+        "representation_diagnostic",
+        "model_architecture"
+      ],
+      "reusable_methods": [
+        "encoder_similarity_blind_pairs",
+        "paired_visual_discrimination"
+      ],
+      "integration_recommendation": "MMVP作为paired counterfactual数据入口；MoF是encoder fusion模型，不注册为probing方法。",
+      "entrypoints": [
+        "LLaVA/llava/model/llava_arch.py:prepare_inputs_labels_for_multimodal_withdino"
+      ],
+      "model_assumptions": [
+        "CLIP/DINOv2 embeddings for blind-pair analysis",
+        "MoF released for LLaVA-1.5-13B; Python 3.10 and vendored LLaVA"
+      ],
+      "limitations": [
+        "预筛选的视觉差异pair不自动保证某项因果干预的唯一变化因素",
+        "未确认仓库级LICENSE文件，整仓复制前应澄清"
+      ],
+      "evidence_urls": [
+        "https://arxiv.org/abs/2401.06209",
+        "https://arxiv.org/html/2401.06209v2",
+        "https://tsb0601.github.io/mmvp_blog/",
+        "https://github.com/tsb0601/MMVP",
+        "https://openaccess.thecvf.com/content/CVPR2024/html/Tong_Eyes_Wide_Shut_Exploring_the_Visual_Shortcomings_of_Multimodal_LLMs_CVPR_2024_paper.html"
+      ],
+      "evidence_sections": [],
+      "report": "docs/research/01_perception_flow.md"
+    },
+    {
+      "id": "visonlyqa",
+      "title": "VisOnlyQA: Large Vision Language Models Still Struggle with Visual Perception of Geometric Information",
+      "checked_on": "2026-09-17",
+      "supplied_venue": "COLM 2025",
+      "verified_venue": "COLM 2025",
+      "identity_status": "verified",
+      "paper_url": "https://arxiv.org/abs/2412.00947",
+      "repository_url": "https://github.com/psunlpgroup/VisOnlyQA",
+      "repository_revision": "f64dac1b49d4960b6cc16751c804b4bdff272bfd",
+      "license": "GPL-3.0 per LICENSE.md; constituent image datasets retain their respective terms",
+      "license_status": "see_license_field_and_report",
+      "upstream_code_status": "source_inspected_not_executed",
+      "runtime_verified": false,
+      "local_implementation": "planned",
+      "classification": [
+        "benchmark",
+        "behavioral_control"
+      ],
+      "reusable_methods": [
+        "geometry_perception_tasks",
+        "textualized_geometry_control",
+        "paired_bootstrap"
+      ],
+      "integration_recommendation": "加入benchmark loader/metrics与image-text matched control recipe，不创建同名hidden-state probe。",
+      "entrypoints": [
+        "src/evaluation/evaluation.py",
+        "src/evaluation/metrics.py:get_metrics",
+        "src/evaluation/paired_bootstrap.py",
+        "src/evaluation_dataset/vlmeval/create_vlmeval_version.py"
+      ],
+      "model_assumptions": [
+        "Benchmark can evaluate black-box and open-weight VLMs",
+        "Finetuning pipelines are model-specific and unnecessary for core probes"
+      ],
+      "limitations": [
+        "VLMEvalKit版本与原始数据存在差异；必须记录具体dataset revision",
+        "benchmark分数不能代替模型内部因果结论"
+      ],
+      "evidence_urls": [
+        "https://arxiv.org/abs/2412.00947",
+        "https://arxiv.org/html/2412.00947v3",
+        "https://github.com/psunlpgroup/VisOnlyQA",
+        "https://github.com/psunlpgroup/VisOnlyQA/blob/main/LICENSE.md"
+      ],
+      "evidence_sections": [],
+      "report": "docs/research/01_perception_flow.md"
+    },
+    {
+      "id": "hidden_plain_sight",
+      "title": "Hidden in plain sight: VLMs overlook their visual representations",
+      "checked_on": "2026-09-17",
+      "supplied_venue": "COLM 2025",
+      "verified_venue": "COLM 2025",
+      "identity_status": "verified",
+      "paper_url": "https://arxiv.org/abs/2506.08008",
+      "repository_url": "https://github.com/stephanie-fu/hidden-plain-sight",
+      "repository_revision": "4371687f1dcbd1932420d8fd7ac836a4f2b8bb14",
+      "license": "No explicit repository license located in inspected tree",
+      "license_status": "see_license_field_and_report",
+      "upstream_code_status": "source_inspected_not_executed",
+      "runtime_verified": false,
+      "local_implementation": "planned",
+      "classification": [
+        "representation_probe",
+        "behavioral_control"
+      ],
+      "reusable_methods": [
+        "dense_correspondence_cosine_readout",
+        "depth_dpt_readout",
+        "layerwise_visual_readout",
+        "blank_image_control",
+        "prompt_sensitivity"
+      ],
+      "integration_recommendation": "ReadoutProbe和MatchedInputControl的主要VLM用例；直接visual readout与VQA输出分开报告。",
+      "entrypoints": [
+        "eval_runner.py",
+        "evals/tasks/blink_correspondence.py:BlinkCorrespondenceEvaluator",
+        "evals/tasks/cvbench_depth.py",
+        "evals/models/probes.py:DPT",
+        "prismatic_patch.py:patch_timm_vit_backbone",
+        "prismatic_patch.py:patch_prismatic_generate"
+      ],
+      "model_assumptions": [
+        "Prismatic models with DINOv2/CLIP/SigLIP/ViT plus Vicuna; explicit spatial patch mapping",
+        "DPT depth uses separately trained decoder/checkpoint, not training-free linear probe",
+        "Published environment: pytorch 2.4.1, transformers 4.38.1, Prismatic git dependency"
+      ],
+      "limitations": [
+        "Visual Evaluation是图中评估分支标签，未核实为独立论文/Activation Patching方法",
+        "全文没有定位到activation patching；prismatic_patch.py中的patch指修改程序实现",
+        "代码公开但许可未找到，建议独立实现通用readout并保留引用"
+      ],
+      "evidence_urls": [
+        "https://arxiv.org/abs/2506.08008",
+        "https://arxiv.org/html/2506.08008v1",
+        "https://hidden-plain-sight.github.io/",
+        "https://github.com/stephanie-fu/hidden-plain-sight",
+        "https://openreview.net/pdf/74c909720993b9aa6a3d8e2e6f98ea5bea6cec00.pdf"
+      ],
+      "evidence_sections": [],
+      "report": "docs/research/01_perception_flow.md"
+    },
+    {
+      "id": "visual_kv_representations",
+      "title": "Visual Representations inside the Language Model",
+      "checked_on": "2026-09-17",
+      "supplied_venue": "COLM 2025",
+      "verified_venue": "COLM 2025",
+      "identity_status": "verified",
+      "paper_url": "https://arxiv.org/abs/2510.04819",
+      "repository_url": null,
+      "repository_revision": null,
+      "license": null,
+      "license_status": "see_license_field_and_report",
+      "upstream_code_status": "not_located",
+      "runtime_verified": false,
+      "local_implementation": "planned",
+      "classification": [
+        "representation_probe",
+        "causal_intervention"
+      ],
+      "reusable_methods": [
+        "visual_kv_readout",
+        "input_agnostic_key_variance",
+        "key_group_attention_ablation",
+        "text_prefix_visual_control"
+      ],
+      "integration_recommendation": "增加K/V site，使用representation-readout与attention-knockout组合，不另造整套执行框架。",
+      "entrypoints": [],
+      "model_assumptions": [
+        "LLaVA-OneVision-7B, Qwen2.5-VL-7B, Llama-3-LLaVA-NeXT-8B",
+        "GQA requires mapping query heads to KV groups",
+        "Zero-shot dense feature evaluation requires image grid/segmentation or correspondence data"
+      ],
+      "limitations": [
+        "论文HTML、作者主页和GitHub exact-title检索未定位官方代码，不等于证明其不存在",
+        "key input-agnostic阈值来自特定模型/数据，不能作为跨模型固定常数",
+        "prefix置于图像前后改变因果可见性，需明确prompt顺序"
+      ],
+      "evidence_urls": [
+        "https://arxiv.org/abs/2510.04819",
+        "https://arxiv.org/html/2510.04819v1",
+        "https://liubl1217.github.io/",
+        "https://openreview.net/pdf/e56bd3ff7464a65655d5addd0f901a2e1c37cb4f.pdf"
+      ],
+      "evidence_sections": [],
+      "report": "docs/research/01_perception_flow.md"
+    },
+    {
+      "id": "cross_modal_information_flow",
+      "title": "Cross-modal Information Flow in Multimodal Large Language Models",
+      "checked_on": "2026-09-17",
+      "supplied_venue": "CVPR 2025",
+      "verified_venue": "CVPR 2025",
+      "identity_status": "verified",
+      "paper_url": "https://arxiv.org/abs/2411.18620",
+      "repository_url": "https://github.com/FightingFighting/cross-modal-information-flow-in-MLLM",
+      "repository_revision": "c9a1111dac4baa175f67716fab473789320187c0",
+      "license": "MIT",
+      "license_status": "see_license_field_and_report",
+      "upstream_code_status": "source_inspected_not_executed",
+      "runtime_verified": false,
+      "local_implementation": "planned",
+      "classification": [
+        "causal_intervention",
+        "representation_probe"
+      ],
+      "reusable_methods": [
+        "attention_knockout",
+        "layer_window_sweep",
+        "last_position_logit_lens"
+      ],
+      "integration_recommendation": "通用AttentionKnockout核心参考；按source key和destination query分组，扫层窗口并记录目标答案概率变化。",
+      "entrypoints": [
+        "InformationFlow.py",
+        "methods.py:set_block_attn_hooks_llava",
+        "methods.py:trace_with_attn_block_llava",
+        "last_position_answer_prob.py",
+        "methods.py:set_hs_patch_hooks"
+      ],
+      "model_assumptions": [
+        "LLaVA family and LLaVA-NeXT environment",
+        "Attention forward must accept editable additive masks",
+        "Generation-time query index differs from prefill index"
+      ],
+      "limitations": [
+        "原实现显式限定LLaVA，不能声称开箱支持Qwen",
+        "set_hs_patch_hooks是仓库工具，论文主实验为attention knockout",
+        "应保留原causal/padding mask并在退出时恢复forward，不能照搬全局覆盖"
+      ],
+      "evidence_urls": [
+        "https://arxiv.org/abs/2411.18620",
+        "https://arxiv.org/html/2411.18620v2",
+        "https://github.com/FightingFighting/cross-modal-information-flow-in-MLLM",
+        "https://github.com/FightingFighting/cross-modal-information-flow-in-MLLM/blob/main/methods.py"
+      ],
+      "evidence_sections": [],
+      "report": "docs/research/01_perception_flow.md"
+    },
+    {
+      "id": "var_visual_attention_sink",
+      "title": "See What You Are Told: Visual Attention Sink in Large Multimodal Models",
+      "checked_on": "2026-09-17",
+      "supplied_venue": "ICLR 2025",
+      "verified_venue": "ICLR 2025",
+      "identity_status": "verified",
+      "paper_url": "https://arxiv.org/abs/2503.03321",
+      "repository_url": "https://github.com/seilk/VisAttnSink",
+      "repository_revision": "98e62d6ca74cf721daede708146d73d400ef501a",
+      "license": "Apache-2.0 (LICENSE text inspected; GitHub SPDX detection is NOASSERTION)",
+      "license_status": "see_license_field_and_report",
+      "upstream_code_status": "source_inspected_not_executed",
+      "runtime_verified": false,
+      "local_implementation": "planned",
+      "classification": [
+        "attention_diagnostic",
+        "causal_intervention",
+        "mitigation"
+      ],
+      "reusable_methods": [
+        "llm_sink_dimension_score",
+        "image_centric_head_selection",
+        "sink_vs_random_attention_knockout",
+        "visual_attention_redistribution"
+      ],
+      "integration_recommendation": "SinkDiagnostics与HeadSelector进入分析层；VAR保留为可选干预recipe。",
+      "entrypoints": [
+        "src/logic/logic.py:DimProspector",
+        "src/logic/logic.py:HeadFork",
+        "src/logic/logic.py:VARProcessor",
+        "src/logic/constants.py:DIM_SINK",
+        "src/llm_modeling/modeling_llama.py",
+        "src/inference.py"
+      ],
+      "model_assumptions": [
+        "Released constants cover Llama-v2 7B/13B based LLaVA",
+        "Sink dimensions and thresholds are model-specific",
+        "torch 2.4.0; transformers pinned git commit 33868a057c02f0368ba63bd1edb746be38fe3d90"
+      ],
+      "limitations": [
+        "高attention不等于高因果贡献",
+        "源码使用class-level mutable state及token坐标假设，library应改为session-scoped state",
+        "random-control需明确每层重新抽样还是跨层固定"
+      ],
+      "evidence_urls": [
+        "https://arxiv.org/abs/2503.03321",
+        "https://arxiv.org/html/2503.03321v1",
+        "https://github.com/seilk/VisAttnSink",
+        "https://github.com/seilk/VisAttnSink/blob/main/src/logic/logic.py",
+        "https://proceedings.iclr.cc/paper_files/paper/2025/hash/da8a39bc39ae1c89dd6ebb1e3bcbb3f3-Abstract-Conference.html"
+      ],
+      "evidence_sections": [],
+      "report": "docs/research/01_perception_flow.md"
+    },
+    {
+      "id": "diysink",
+      "title": "To Sink or Not to Sink: Visual Information Pathways in Large Vision-Language Models",
+      "checked_on": "2026-09-17",
+      "supplied_venue": "ICLR 2026",
+      "verified_venue": "ICLR 2026",
+      "identity_status": "verified",
+      "paper_url": "https://arxiv.org/abs/2510.08510",
+      "repository_url": null,
+      "repository_revision": null,
+      "license": null,
+      "license_status": "see_license_field_and_report",
+      "upstream_code_status": "project_page_only_code_coming_soon",
+      "runtime_verified": false,
+      "local_implementation": "planned",
+      "classification": [
+        "attention_diagnostic",
+        "representation_probe",
+        "model_architecture",
+        "mitigation"
+      ],
+      "reusable_methods": [
+        "vit_norm_sink_classification",
+        "vit_vs_llm_sink_provenance",
+        "isolated_visual_token_decode",
+        "sink_only_vs_nonsink_only_ablation",
+        "sink_to_front"
+      ],
+      "integration_recommendation": "优先加入ViT/LLM来源分离、norm诊断和token-set干预；DIYSink双projector/gating不属于首版probing library。",
+      "entrypoints": [],
+      "model_assumptions": [
+        "Need vision-encoder and decoder activations plus token alignment",
+        "Sink-to-front must carry positional information with tokens",
+        "DIYSink architecture requires new projector/gating training"
+      ],
+      "limitations": [
+        "官方项目页面仍标Code (Coming Soon) Upon Acceptance；GitHub检索只找到展示网站仓库",
+        "ViT sink可含全局语义，不能继承LLM sink=冗余的假设",
+        "ICLR official accepted poster page verified; OpenReview forum browser challenge prevented direct review-page read"
+      ],
+      "evidence_urls": [
+        "https://arxiv.org/abs/2510.08510",
+        "https://arxiv.org/html/2510.08510v1",
+        "https://davidhalladay.github.io/diysink_demo/",
+        "https://iclr.cc/virtual/2026/poster/10007059",
+        "https://openreview.net/forum?id=sQGlhjKUC0"
+      ],
+      "evidence_sections": [],
+      "report": "docs/research/01_perception_flow.md"
+    },
+    {
+      "id": "sadt_harm_veed",
+      "title": "Same Attention, Different Truths: Put Logit-Lens over Visual Attention to Detect and Mitigate LVLM Object Hallucination",
+      "checked_on": "2026-09-17",
+      "supplied_venue": "CVPR 2026",
+      "verified_venue": "CVPR 2026",
+      "identity_status": "verified",
+      "paper_url": "https://arxiv.org/abs/2608.07302",
+      "repository_url": "https://github.com/wzczc/SADT",
+      "repository_revision": "e07a8432498334d91040ef9ede9371b32e6a8d3c",
+      "license": "Apache-2.0",
+      "license_status": "see_license_field_and_report",
+      "upstream_code_status": "source_inspected_not_executed",
+      "runtime_verified": false,
+      "local_implementation": "planned",
+      "classification": [
+        "attention_diagnostic",
+        "lens",
+        "causal_input_intervention",
+        "mitigation"
+      ],
+      "reusable_methods": [
+        "logit_lens_consistency_check",
+        "high_attention_region_mask_diagnostic",
+        "harm",
+        "veed"
+      ],
+      "integration_recommendation": "LLCC作为AttentionStats + LogitLens的组合；HARM分离为输入图像region masking；VEED进入可选decoding intervention。",
+      "entrypoints": [
+        "tools/sadt/core.py:SADTConfig",
+        "tools/sadt/core.py:detect_hallucinations",
+        "tools/sadt/core.py:mask_high_attention_regions_vcd",
+        "tools/sadt/core.py:build_vcd_hallucination_guidance",
+        "tools/sadt/detect_classify_mitigate.py:run_one_image",
+        "tools/sadt/vcd_sample.py"
+      ],
+      "model_assumptions": [
+        "Current released implementation is LLaVA-focused, transformers==4.37.2",
+        "Default image marker -200, 576 visual tokens, 24x24 grid and 336px",
+        "Optional semantic matchers include predefined/COCO/WordNet/LLM judge; exact mode must be recorded"
+      ],
+      "limitations": [
+        "Paper/search cache still says code forthcoming; live GitHub pinned tree contains implementation",
+        "Readout currently uses model.lm_head directly; preserve paper behavior separately from normalized generic logit lens",
+        "HARM masks image pixels and regenerates; it is not decoder attention knockout",
+        "Grid mapping, generation timestep alignment, class-vs-CLI defaults and veed_alpha need explicit adaptation/validation before reproduction claims"
+      ],
+      "evidence_urls": [
+        "https://arxiv.org/abs/2608.07302",
+        "https://arxiv.org/html/2608.07302v1",
+        "https://openaccess.thecvf.com/content/CVPR2026/papers/Wang_Same_Attention_Different_Truths_Put_Logit-Lens_over_Visual_Attention_to_CVPR_2026_paper.pdf",
+        "https://github.com/wzczc/SADT",
+        "https://github.com/wzczc/SADT/blob/e07a8432498334d91040ef9ede9371b32e6a8d3c/tools/sadt/core.py",
+        "https://github.com/wzczc/SADT/blob/e07a8432498334d91040ef9ede9371b32e6a8d3c/tools/sadt/detect_classify_mitigate.py"
+      ],
+      "evidence_sections": [],
+      "report": "docs/research/01_perception_flow.md"
+    },
+    {
+      "id": "hallusionbench",
+      "title": "HallusionBench: An Advanced Diagnostic Suite for Entangled Language Hallucination and Visual Illusion in Large Vision-Language Models",
+      "checked_on": "2026-09-17",
+      "supplied_venue": "CVPR 2024",
+      "verified_venue": "CVPR 2024",
+      "identity_status": "verified",
+      "paper_url": "https://arxiv.org/abs/2310.14566",
+      "repository_url": "https://github.com/tianyi-lab/HallusionBench",
+      "repository_revision": "744007c232c292942c7f80eb61edb2465482da31",
+      "license": "BSD-3-Clause",
+      "license_status": "see_license_field_and_report",
+      "upstream_code_status": "public_evaluation_code",
+      "runtime_verified": false,
+      "local_implementation": "planned",
+      "classification": [
+        "diagnostic_benchmark",
+        "behavioral_metrics"
+      ],
+      "reusable_methods": [],
+      "integration_recommendation": [
+        {
+          "name": "HallusionBenchDataset",
+          "kind": "dataset_adapter"
+        },
+        {
+          "name": "PairConsistency",
+          "kind": "metric"
+        },
+        {
+          "name": "Controlled visual-pair recipe",
+          "kind": "proposed_recipe",
+          "original_paper_method": false
+        }
+      ],
+      "entrypoints": [
+        "evaluation.py",
+        "utils.py",
+        "HallusionBench.json"
+      ],
+      "model_assumptions": [],
+      "limitations": [
+        "No original activation-patching algorithm. Candidate image pairs need token alignment and answer-change validation before patching.",
+        "README download statistics are historical; count the selected dataset revision."
+      ],
+      "evidence_urls": [
+        "https://arxiv.org/abs/2310.14566",
+        "https://arxiv.org/pdf/2310.14566",
+        "https://github.com/tianyi-lab/HallusionBench",
+        "https://github.com/tianyi-lab/HallusionBench/blob/744007c232c292942c7f80eb61edb2465482da31/LICENSE.md"
+      ],
+      "evidence_sections": [
+        "Paper Sections 3-4",
+        "Official README Evaluation and Metric"
+      ],
+      "report": "docs/research/02_conflicts_composition.md"
+    },
+    {
+      "id": "insight_over_sight",
+      "title": "Insight Over Sight: Exploring the Vision-Knowledge Conflicts in Multimodal LLMs",
+      "checked_on": "2026-09-17",
+      "supplied_venue": "ACL 2025",
+      "verified_venue": "ACL 2025",
+      "identity_status": "verified",
+      "paper_url": "https://aclanthology.org/2025.acl-long.872/",
+      "repository_url": "https://github.com/xyliu-cs/ConflictVIS",
+      "repository_revision": null,
+      "license": "unverified_no_license_observed",
+      "license_status": "see_license_field_and_report",
+      "upstream_code_status": "readme_inference_example_assets_results",
+      "runtime_verified": false,
+      "local_implementation": "planned",
+      "classification": [
+        "diagnostic_benchmark",
+        "borrowed_relevance_analysis",
+        "prompting_mitigation"
+      ],
+      "reusable_methods": [
+        {
+          "name": "Input-output relevance",
+          "origin": "LVLM-Interpret / Stan et al. 2024",
+          "borrowed": true,
+          "integration": "Reuse attribution primitive under original source, not a new ConflictVIS primitive."
+        }
+      ],
+      "integration_recommendation": [
+        {
+          "name": "ConflictVisDataset",
+          "kind": "dataset_adapter"
+        },
+        {
+          "name": "Focus-on-Vision",
+          "kind": "optional_prompt_control"
+        }
+      ],
+      "entrypoints": [
+        "README.md (dataset loading and inference snippet)"
+      ],
+      "model_assumptions": [],
+      "limitations": [
+        "No dedicated probing code found in ConflictVIS root listing.",
+        "FoV is prompting; VCD, PAI and CoT/SFT are mitigation baselines.",
+        "ACL PDF exceeded web fetch size; corresponding arXiv full text was inspected."
+      ],
+      "evidence_urls": [
+        "https://aclanthology.org/2025.acl-long.872/",
+        "https://arxiv.org/html/2410.08145",
+        "https://github.com/xyliu-cs/ConflictVIS"
+      ],
+      "evidence_sections": [
+        "Paper Section 4.4 and Figure 7",
+        "Paper bibliography Stan et al. 2024",
+        "Official README citation and usage"
+      ],
+      "report": "docs/research/02_conflicts_composition.md"
+    },
+    {
+      "id": "whoops_aha",
+      "title": "When Seeing Overrides Knowing: Disentangling Knowledge Conflicts in Vision-Language Models",
+      "checked_on": "2026-09-17",
+      "supplied_venue": "ACL 2026",
+      "verified_venue": "ACL 2026",
+      "identity_status": "verified",
+      "paper_url": "https://aclanthology.org/2026.acl-long.642/",
+      "repository_url": "https://github.com/francescortu/Seeing-Knowing",
+      "repository_revision": "830f6752e1c2af0120242eb3b8120120b20166ef",
+      "license": "no_license_observed",
+      "license_status": "see_license_field_and_report",
+      "upstream_code_status": "public_paper_experiment_code",
+      "runtime_verified": false,
+      "local_implementation": "planned",
+      "classification": [
+        "mechanistic_probe",
+        "causal_intervention",
+        "visual_attribution",
+        "diagnostic_benchmark"
+      ],
+      "reusable_methods": [
+        {
+          "name": "Component/head logit inspection",
+          "family": "lens",
+          "detail": "Compare factual versus image-consistent candidate tokens from attention/MLP/head outputs at last input token."
+        },
+        {
+          "name": "Modality-specific head reweighting",
+          "family": "attention_intervention",
+          "detail": "Post-softmax multiplicative intervention on selected head/query/image-or-text-key weights."
+        },
+        {
+          "name": "Conflict visual-token localization",
+          "family": "attribution",
+          "detail": "Head-attention thresholding with gradient baseline, token removal and object/background attribution ratio."
+        }
+      ],
+      "integration_recommendation": [
+        {
+          "name": "ComponentLogitLens",
+          "kind": "primitive"
+        },
+        {
+          "name": "AttentionReweight",
+          "kind": "primitive"
+        },
+        {
+          "name": "VisualAttribution",
+          "kind": "primitive"
+        },
+        {
+          "name": "KnowledgeConflict",
+          "kind": "recipe"
+        },
+        {
+          "name": "WhoopsAhaDataset",
+          "kind": "dataset_adapter"
+        }
+      ],
+      "entrypoints": [
+        "script/1_logitlens.py",
+        "script/2_intervention.py",
+        "script/3_pixel_localization.py",
+        "script/experiment/1_heads_ablation/ablation_utils.py",
+        "src/experiment_manager.py",
+        "src/visual_attn.py"
+      ],
+      "model_assumptions": [],
+      "limitations": [
+        "Public code is not an explicit redistribution license.",
+        "Model-specific visual crop/token mapping required.",
+        "State pre/post-softmax and renormalization policy explicitly.",
+        "Head vectors require residual-space output projection for vocabulary attribution."
+      ],
+      "evidence_urls": [
+        "https://aclanthology.org/2026.acl-long.642/",
+        "https://aclanthology.org/2026.acl-long.642.pdf",
+        "https://github.com/francescortu/Seeing-Knowing"
+      ],
+      "evidence_sections": [
+        "Paper Sections 4.2 and 5.2-5.4",
+        "Official README Main Commands",
+        "pyproject.toml",
+        "ablation_utils.py"
+      ],
+      "report": "docs/research/02_conflicts_composition.md"
+    },
+    {
+      "id": "compose_and_fuse",
+      "title": "Compose and Fuse: Revisiting the Foundational Bottlenecks in Multimodal Reasoning",
+      "checked_on": "2026-09-17",
+      "supplied_venue": "ICLR 2026",
+      "verified_venue": "ICLR 2026",
+      "identity_status": "verified",
+      "paper_url": "https://arxiv.org/abs/2509.23744",
+      "repository_url": "https://github.com/DELTA-DoubleWise/OmniReason",
+      "repository_revision": "7a5a1ef471856b2fe4c093904c1981e7ffa42781",
+      "license": "Apache-2.0",
+      "license_status": "see_license_field_and_report",
+      "upstream_code_status": "public_paper_experiment_code",
+      "runtime_verified": false,
+      "local_implementation": "planned",
+      "classification": [
+        "linear_probe",
+        "attention_intervention",
+        "diagnostic_benchmark",
+        "prompting_mitigation"
+      ],
+      "reusable_methods": [
+        {
+          "name": "Attention-feature usefulness probe",
+          "family": "linear_probe",
+          "detail": "Pool generation-to-fact attention features; predict useful versus distracting facts."
+        },
+        {
+          "name": "Attention-feature modality probe",
+          "family": "linear_probe",
+          "detail": "Logistic regression over attention-derived features and layer/head coefficient analysis."
+        },
+        {
+          "name": "Layer/head attention temperature intervention",
+          "family": "attention_intervention",
+          "detail": "Scale queries by inverse temperature on selected heads/layers before softmax."
+        }
+      ],
+      "integration_recommendation": [
+        {
+          "name": "LinearProbe",
+          "kind": "primitive"
+        },
+        {
+          "name": "AttentionTemperature",
+          "kind": "primitive"
+        },
+        {
+          "name": "CompositionDiagnostics",
+          "kind": "recipe"
+        },
+        {
+          "name": "OmniReasonDataset",
+          "kind": "dataset_adapter"
+        }
+      ],
+      "entrypoints": [
+        "src/interpretation/extract_attention.py",
+        "src/interpretation/probe_linear_layerwise.py",
+        "src/interpretation/attention_manipulation.py"
+      ],
+      "model_assumptions": [],
+      "limitations": [
+        "Attention temperature differs from sampling temperature.",
+        "Modality/fact spans and group-wise train/test split are required.",
+        "Probe coefficients do not independently establish causal importance."
+      ],
+      "evidence_urls": [
+        "https://arxiv.org/abs/2509.23744",
+        "https://arxiv.org/html/2509.23744v4",
+        "https://github.com/DELTA-DoubleWise/OmniReason/blob/7a5a1ef471856b2fe4c093904c1981e7ffa42781/LICENSE",
+        "https://github.com/DELTA-DoubleWise/OmniReason"
+      ],
+      "evidence_sections": [
+        "Paper Section 4 and Appendix A.2",
+        "probe_linear_layerwise.py GroupKFold",
+        "attention_manipulation.py _register_q_proj_hooks"
+      ],
+      "report": "docs/research/02_conflicts_composition.md"
+    },
+    {
+      "id": "visual_counting_bottleneck",
+      "title": "Unveiling the Visual Counting Bottleneck in Vision-Language Models",
+      "checked_on": "2026-09-17",
+      "supplied_venue": "ICML 2026",
+      "verified_venue": "ICML 2026",
+      "identity_status": "verified",
+      "paper_url": "https://arxiv.org/abs/2605.30170",
+      "repository_url": "https://github.com/Russellpang/semproj",
+      "repository_revision": "8fb587281f815e2ed6cf2493707c3013d9559ae3",
+      "license": "no_license_observed",
+      "license_status": "see_license_field_and_report",
+      "upstream_code_status": "public_paper_experiment_code",
+      "runtime_verified": false,
+      "local_implementation": "planned",
+      "classification": [
+        "linear_probe",
+        "token_ablation",
+        "head_ablation",
+        "synthetic_diagnostic_task"
+      ],
+      "reusable_methods": [
+        {
+          "name": "Patch occupancy / hidden-number probe",
+          "family": "linear_probe",
+          "detail": "Classify visual patches and aggregate target occupancy into count."
+        },
+        {
+          "name": "Layerwise hidden-number probing",
+          "family": "linear_probe",
+          "detail": "Read frozen vision/LM representations; optional PCA with logistic regression or linear SVM."
+        },
+        {
+          "name": "Probe-guided token masking",
+          "family": "causal_intervention",
+          "detail": "Mask k target visual tokens in attention and score whether predicted count decreases by k."
+        },
+        {
+          "name": "Visual/text head-deactivation comparison",
+          "family": "head_ablation",
+          "detail": "Compare head effects across matched visual and textual counting settings."
+        }
+      ],
+      "integration_recommendation": [
+        {
+          "name": "LinearProbe",
+          "kind": "primitive"
+        },
+        {
+          "name": "TokenAblation",
+          "kind": "primitive"
+        },
+        {
+          "name": "HeadAblation",
+          "kind": "primitive"
+        },
+        {
+          "name": "HiddenNumber",
+          "kind": "recipe"
+        }
+      ],
+      "entrypoints": [
+        "hidden_number_probing_clf.py",
+        "causal_hidden_number_intervention.py",
+        "test_head_deactivation_text.py",
+        "test_head_deactivation_vision.py",
+        "train_hidden_num_qwen3vl.py",
+        "train_lm_layer_hidden_num_qwen3vl.py"
+      ],
+      "model_assumptions": [],
+      "limitations": [
+        "Synthetic Go-board alignment and labels are task-specific.",
+        "Custom-model ID/OOD split and Qwen probe split differ.",
+        "Do not generalize separability on Go boards to complete understanding of natural-image counting.",
+        "Code is public without explicit repository license."
+      ],
+      "evidence_urls": [
+        "https://arxiv.org/abs/2605.30170",
+        "https://arxiv.org/pdf/2605.30170",
+        "https://github.com/Russellpang/semproj"
+      ],
+      "evidence_sections": [
+        "Paper Sections 2.3, 3-4, Appendix D",
+        "Paper first-page ICML 2026 proceedings statement",
+        "Official README",
+        "Probe and intervention scripts"
+      ],
+      "report": "docs/research/02_conflicts_composition.md"
+    },
+    {
+      "id": "mme_cot",
+      "title": "MME-CoT: Benchmarking Chain-of-Thought in Large Multimodal Models for Reasoning Quality, Robustness, and Efficiency",
+      "checked_on": "2026-09-17",
+      "supplied_venue": "ICML 2025",
+      "verified_venue": "ICML 2025",
+      "identity_status": "verified",
+      "paper_url": "https://proceedings.mlr.press/v267/jiang25n.html",
+      "repository_url": "https://github.com/MME-Benchmarks/MME-CoT",
+      "repository_revision": "08fa4e9144d47a69d5129376b8f3f449c28a2298",
+      "license": "no_license_observed",
+      "license_status": "see_license_field_and_report",
+      "upstream_code_status": "public_evaluation_code",
+      "runtime_verified": false,
+      "local_implementation": "planned",
+      "classification": [
+        "behavioral_evaluation",
+        "cot_diagnostics"
+      ],
+      "reusable_methods": [],
+      "integration_recommendation": [
+        {
+          "name": "CoTDiagnostics",
+          "kind": "evaluation_plugin",
+          "metrics": [
+            "step_precision",
+            "step_recall",
+            "stability",
+            "efficacy",
+            "relevance_rate",
+            "reflection_quality"
+          ]
+        }
+      ],
+      "entrypoints": [
+        "main.py",
+        "direct_eval.py",
+        "final_score/quality.py",
+        "final_score/robustness.py",
+        "final_score/efficiency.py",
+        "prompt/"
+      ],
+      "model_assumptions": [],
+      "limitations": [
+        "No new activation-level causal probe.",
+        "Some metrics require external GPT judging; must be optional and versioned.",
+        "Public code has no observed repository license."
+      ],
+      "evidence_urls": [
+        "https://proceedings.mlr.press/v267/jiang25n.html",
+        "https://arxiv.org/html/2502.09621v1",
+        "https://github.com/MME-Benchmarks/MME-CoT"
+      ],
+      "evidence_sections": [
+        "Paper Section 2",
+        "Official README Evaluation"
+      ],
+      "report": "docs/research/02_conflicts_composition.md"
+    },
+    {
+      "id": "opera",
+      "title": "OPERA: Alleviating Hallucination in Multi-Modal Large Language Models via Over-Trust Penalty and Retrospection-Allocation",
+      "checked_on": "2026-09-17",
+      "supplied_venue": "CVPR 2024",
+      "verified_venue": "CVPR 2024",
+      "identity_status": "verified",
+      "paper_url": "https://arxiv.org/abs/2311.17911",
+      "repository_url": "https://github.com/shikiw/OPERA",
+      "repository_revision": null,
+      "license": "MIT",
+      "license_status": "verified_root_license",
+      "upstream_code_status": "research_code_present_not_executed",
+      "runtime_verified": false,
+      "local_implementation": "planned",
+      "classification": [
+        "attention_diagnostic",
+        "decoding_intervention"
+      ],
+      "reusable_methods": [
+        "generated_token_attention_aggregation",
+        "summary_token_trajectory"
+      ],
+      "integration_recommendation": "纳入只读聚集诊断；完整 OPERA decoder 作为可选扩展",
+      "entrypoints": [
+        "transformers-4.29.2/src/transformers/generation/utils.py:opera_decoding"
+      ],
+      "model_assumptions": [],
+      "limitations": [
+        "需 attention weights；生成文本窗口排除 prompt/image tokens",
+        "官方实现修改 Transformers 4.29.2；不能作为全库强依赖",
+        "根许可证不覆盖所有 vendor 上游代码",
+        "注意力聚集本身不是因果定位"
+      ],
+      "evidence_urls": [
+        "https://arxiv.org/html/2311.17911v3",
+        "https://github.com/shikiw/OPERA/blob/main/transformers-4.29.2/src/transformers/generation/utils.py",
+        "https://github.com/shikiw/OPERA/blob/main/LICENSE",
+        "https://arxiv.org/abs/2311.17911",
+        "https://github.com/shikiw/OPERA"
+      ],
+      "evidence_sections": [],
+      "report": "docs/research/03_hallucination_frameworks.md"
+    },
+    {
+      "id": "vista",
+      "title": "The Hidden Life of Tokens: Reducing Hallucination of Large Vision-Language Models Via Visual Information Steering",
+      "checked_on": "2026-09-17",
+      "supplied_venue": "ICML 2025",
+      "verified_venue": "ICML 2025, PMLR 267",
+      "identity_status": "verified",
+      "paper_url": "https://proceedings.mlr.press/v267/li25ca.html",
+      "repository_url": "https://github.com/LzVv123456/VISTA",
+      "repository_revision": null,
+      "license": "MIT",
+      "license_status": "verified_root_license",
+      "upstream_code_status": "research_code_present_not_executed",
+      "runtime_verified": false,
+      "local_implementation": "planned",
+      "classification": [
+        "lens_diagnostic",
+        "activation_intervention",
+        "decoding_intervention"
+      ],
+      "reusable_methods": [
+        "layer_time_token_rank_trajectory",
+        "visual_steering_vector",
+        "self_logits_augmentation"
+      ],
+      "integration_recommendation": "优先纳入 token-rank 轨迹；VSV/SLA 独立扩展",
+      "entrypoints": [
+        "steering_vector.py:obtain_vsv",
+        "steering_vector.py:ForwardTracer",
+        "llm_layers.py:VSVLayer",
+        "llm_layers.py:add_vsv_layers",
+        "chair_eval.py"
+      ],
+      "model_assumptions": [],
+      "limitations": [
+        "原始 genuine/hallucinated 词类别由 oracle 标注，不能视为模型自动给出的真值",
+        "官方 image-specific steering 评测 batch size 为 1",
+        "anchor.py 存在固定 image token 长度，需适配动态分辨率",
+        "需正确应用最终 norm/lm_head；generation step 与 layer 维度须保持"
+      ],
+      "evidence_urls": [
+        "https://arxiv.org/html/2502.03628v2",
+        "https://github.com/LzVv123456/VISTA/blob/main/steering_vector.py",
+        "https://github.com/LzVv123456/VISTA/blob/main/chair_eval.py",
+        "https://github.com/LzVv123456/VISTA/blob/main/LICENSE",
+        "https://proceedings.mlr.press/v267/li25ca.html",
+        "https://github.com/LzVv123456/VISTA"
+      ],
+      "evidence_sections": [],
+      "report": "docs/research/03_hallucination_frameworks.md"
+    },
+    {
+      "id": "mmhalsnowball_rvd",
+      "title": "Investigating and Mitigating the Multimodal Hallucination Snowballing in Large Vision-Language Models",
+      "checked_on": "2026-09-17",
+      "supplied_venue": "ACL 2024",
+      "verified_venue": "ACL 2024",
+      "identity_status": "verified",
+      "paper_url": "https://aclanthology.org/2024.acl-long.648/",
+      "repository_url": "https://github.com/whongzhong/MMHalSnowball",
+      "repository_revision": null,
+      "license": "GPL-3.0",
+      "license_status": "verified_root_license",
+      "upstream_code_status": "research_code_present_not_executed",
+      "runtime_verified": false,
+      "local_implementation": "planned",
+      "classification": [
+        "behavioral_benchmark",
+        "distribution_diagnostic",
+        "decoding_intervention"
+      ],
+      "reusable_methods": [
+        "context_conflict_protocol",
+        "flip_rate",
+        "weak_flip_rate",
+        "residual_visual_js_divergence"
+      ],
+      "integration_recommendation": "评测协议与 JSD 诊断纳入；RVD 作为扩展，不归入 activation patching",
+      "entrypoints": [
+        "evaluation/eval.py:mark_flip",
+        "residual_visual_decoding/rvd_sample.py:sample",
+        "residual_visual_decoding/rvd_sample.py:rvd_sampling"
+      ],
+      "model_assumptions": [],
+      "limitations": [
+        "FR/WFR 分母为 clean 条件回答正确的样本数，必须按 ID 配对",
+        "RVD 的 residual 是输入/解码分支，不是 residual-stream patching",
+        "README evolve_rvd_sampling 与源码 rvd_sampling 名称不一致",
+        "源码替换 GenerationMixin.sample；适配需隔离",
+        "本次未复制 GPL 源码"
+      ],
+      "evidence_urls": [
+        "https://arxiv.org/html/2407.00569v1",
+        "https://github.com/whongzhong/MMHalSnowball/blob/main/evaluation/eval.py",
+        "https://github.com/whongzhong/MMHalSnowball/blob/main/residual_visual_decoding/rvd_sample.py",
+        "https://github.com/whongzhong/MMHalSnowball/blob/main/LICENSE",
+        "https://aclanthology.org/2024.acl-long.648/",
+        "https://github.com/whongzhong/MMHalSnowball"
+      ],
+      "evidence_sections": [],
+      "report": "docs/research/03_hallucination_frameworks.md"
+    },
+    {
+      "id": "visual_flow",
+      "title": "Visual Multi-Agent System: Mitigating Hallucination Snowballing via Visual Flow",
+      "checked_on": "2026-09-17",
+      "supplied_venue": "ICLR 2026",
+      "verified_venue": "ICLR 2026 per official repository and indexed OpenReview PDF; live forum blocked",
+      "identity_status": "paper_identity_verified_venue_partially_verified",
+      "paper_url": "https://openreview.net/forum?id=Ii4HBlERix",
+      "repository_url": "https://github.com/xlyu0106/ViF",
+      "repository_revision": null,
+      "license": null,
+      "license_status": "license_missing_in_inspected_tree_and_metadata",
+      "upstream_code_status": "scaffold_only_not_paper_reproduction",
+      "runtime_verified": false,
+      "local_implementation": "planned",
+      "classification": [
+        "attention_diagnostic",
+        "causal_ablation_recipe",
+        "multiagent_intervention"
+      ],
+      "reusable_methods": [
+        "turn_layer_token_attention_trajectory",
+        "attention_trend_token_grouping",
+        "layerwise_visual_token_ablation"
+      ],
+      "integration_recommendation": "收录论文分析 recipe；完整 ViF 暂缓，不标记完整开源复现",
+      "entrypoints": [
+        "vif/models/vlm_iface.py:VLMInterface",
+        "vif/models/base_stub.py:BaseVLMStub",
+        "vif/utils/selection.py:select_relay_tokens",
+        "vif/utils/reallocation.py"
+      ],
+      "model_assumptions": [],
+      "limitations": [
+        "OpenReview forum/PDF 直连受浏览器校验；正文使用 arXiv v2",
+        "VLMInterface 真实 backend 抛 NotImplementedError",
+        "BaseVLMStub 用随机张量生成 hidden/attention/key states",
+        "未发现 LICENSE，不能按有明确授权的开源实现集成",
+        "paper-derived recipe 需独立验证 causal mask 与 token removal 语义"
+      ],
+      "evidence_urls": [
+        "https://arxiv.org/html/2509.21789v2",
+        "https://openreview.net/pdf/a0c81d92bcb87e542f024c235b913e1c117ec355.pdf",
+        "https://github.com/xlyu0106/ViF/blob/main/vif/models/vlm_iface.py",
+        "https://github.com/xlyu0106/ViF/blob/main/vif/models/base_stub.py",
+        "https://openreview.net/forum?id=Ii4HBlERix",
+        "https://github.com/xlyu0106/ViF"
+      ],
+      "evidence_sections": [],
+      "report": "docs/research/03_hallucination_frameworks.md"
+    }
+  ]
+}
