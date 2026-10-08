@@ -41,8 +41,8 @@ Returns a `ProbeResult`: Teacher-forced target `logits[L,B,T_target,V]` plus sou
 
 ## Support and scope
 
-All seven VLM adapters. The bound method returns full target logits; autoregressive text generation is not implemented. Cross-model vector dimensionality alone does not establish a meaningful mapping.
+Supported language-model residual sites and all eight VLM families. The bound method returns full target logits; autoregressive text generation is not implemented. Cross-model vector dimensionality alone does not establish a meaningful mapping.
 
-[Paper / source reference](../REFERENCES.md#patchscopes) ·
+[Paper / source reference](../REFERENCES.md#lens-methods) ·
 [Tensor implementation](../../src/vlm_probing/lenses/patchscope.py) ·
 [Shared result conventions](README.md#shared-conventions)

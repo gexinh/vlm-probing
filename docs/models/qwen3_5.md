@@ -50,16 +50,16 @@ Qwen3.5-4B has 32 language layers. Residual lenses and interventions cover all 3
 
 The adapter captures gated values immediately before the attention output projection and handles the final RMSNorm's `1 + weight` gain. `H * head_dim` need not equal the residual width. Transformers' PyTorch fallback works without the optional fast linear-attention kernels.
 
-Native HF attention outputs are observational. Knockout, probability reweighting,
-attention temperature, and EAP-IG require the explicit editable sites described
-in the [capability matrix](README.md#capability-matrix).
+The eager adapter exposes editable pre-softmax scores and consumed attention
+probabilities at standard-attention layers. Knockout, temperature, reweighting,
+and ATTATTR operate on these sites; hybrid linear-attention blocks have no
+softmax-probability counterpart. Original EAP-IG remains a GPT-2 graph method.
 
 ## Validation
 
 Both the tiny architecture and the named local pretrained checkpoint were run. Pretrained checks cover an image prompt, selected Logit Lens layers, EmbedLens, an attention profile, self-patching, and an image intervention.
 
-See [test coverage and results](../releases/v0.3.0.md), the
-[executable matrix](../../examples/hf_model_matrix.py), and the
+See the [architecture checks](../../examples/hf_model_matrix.py) and the
 [official model implementation](https://github.com/huggingface/transformers/blob/v5.3.0/src/transformers/models/qwen3_5/modeling_qwen3_5.py).
 
 Next: [method guides](../methods/README.md) and [metrics/calibration](../API.md).

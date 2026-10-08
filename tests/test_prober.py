@@ -28,7 +28,7 @@ class ProberTests(unittest.TestCase):
 
     def test_auto_and_describe_are_read_only(self):
         summary = self.probe.describe()
-        self.assertEqual(sum(x["available"] for x in summary["methods"].values()), 18)
+        self.assertEqual(sum(x["available"] for x in summary["methods"].values()), 22)
         self.assertTrue(self.model.training)
         with self.assertRaises(CapabilityError):
             Prober(torch.nn.Linear(2, 2))
@@ -143,13 +143,7 @@ class ProberTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "visual layouts"):
             method.run(self.inputs, source=ProbeInputs(self.inputs, layout), metric=self.metric)
 
-    def test_ablation_and_zero_strength_steering_controls(self):
-        for mode in ("zero", "mean", "resample"):
-            kwargs = {} if mode == "zero" else {"reference": self.inputs}
-            result = self.probe.causal.ablate(layers=[0], mode=mode).run(self.inputs, metric=self.metric, **kwargs)
-            self.assertEqual(result.tensors["effect"].shape, (1, 2))
-            if mode == "resample":
-                torch.testing.assert_close(result.tensors["effect"], torch.zeros(1, 2))
+    def test_zero_strength_steering_control(self):
         result = self.probe.causal.steer(layers=[0], strength=0.).run(
             self.inputs, direction=torch.randn(6), metric=self.metric)
         torch.testing.assert_close(result.tensors["effect"], torch.zeros(1, 2))
@@ -243,7 +237,7 @@ class ProberTests(unittest.TestCase):
         def failure(logits):
             raise RuntimeError("metric failed")
         with self.assertRaisesRegex(RuntimeError, "metric failed"):
-            self.probe.causal.ablate(layers=[0]).run(self.inputs, metric=failure)
+            self.probe.causal.path(senders=[(0, 0)]).run(self.inputs, donor=self.inputs, metric=failure)
         self.assertEqual(states, [m.training for m in self.model.modules()])
         self.assertTrue(all(not m._forward_hooks and not m._forward_pre_hooks for m in self.model.modules()))
         result = self.probe.lens.logit().run(self.inputs)

@@ -107,7 +107,7 @@
   <rect x="824" y="472" width="46" height="46" rx="13" fill="#F2ECFF"/>
   <path d="M835 506L847 482L859 506M840 497H854" fill="none" stroke="#8259E8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
   <text x="887" y="496" class="family">Causal methods</text>
-  <text x="824" y="543" class="method">Patching · Ablation · Attribution</text>
+  <text x="824" y="543" class="method">Patching · Paths · Attribution</text>
   <text x="824" y="566" class="method">Knockout · EAP-IG · Steering</text>
 
   <!-- Results -->

@@ -6,6 +6,12 @@ Each guide explains the computation, includes a usage example, and documents
 parameters and returned tensors. Availability depends on the model adapter;
 check `probe.describe()` or the [model matrix](../models/README.md).
 
+Residual and head lenses support language-model and VLM representations;
+EmbedLens additionally needs projected visual tokens. Spatial attention maps
+can analyze vision classifiers or decoder visual tokens when the adapter
+exposes the required sites. Original EAP-IG currently uses a text-only GPT-2
+graph. These modality boundaries are documented on each method page.
+
 ## Lens
 
 | Method | Public factory | What it does |
@@ -27,25 +33,37 @@ check `probe.describe()` or the [model matrix](../models/README.md).
 | [Attention Relevance](attention_relevance.md) | `probe.attention.relevance(...)` | Propagate positive gradient-weighted self-attention for a selected output score. |
 | [Attention Reweighting](attention_reweight.md) | `probe.attention.reweight(...)` | Rescale attention on selected key tokens and measure the output change. |
 | [Attention Temperature](attention_temperature.md) | `probe.attention.temperature(...)` | Change the sharpness of attention at selected query rows. |
+| [Attention Grad-CAM](attention_maps.md) | `probe.attention.grad_cam(...)` | Target-conditioned CAM using attention heads as channels. |
+| [Self-Attention Attribution](attention_maps.md) | `probe.attention.attribution(...)` | Integrate gradients along a single layer's zero-to-original probability path. |
+| [TAM](attention_maps.md) | `probe.attention.tam(...)` | Combine backward Markov transitions with input-path final-attention feedback. |
+| [Beyond Intuition](attention_maps.md) | `probe.attention.beyond_intuition(...)` | Headwise or tokenwise perception with integrated reasoning feedback. |
+| [Chefer DTD/LRP](chefer_lrp.md) | `probe.attention.dtd_lrp(...)` | Copy native ViT weights into the pinned author's actual relevance-propagation backend. |
+
+Profile, head logit attribution, reweighting, and temperature are reusable
+statistics/readout/intervention tools. They do not reproduce VAR, OPERA, or PAI.
+The [source index](../REFERENCES.md) identifies the paper-backed attribution
+algorithms and their implemented scope.
 
 ## Causal
 
 | Method | Public factory | What it does |
 | --- | --- | --- |
 | [Activation Patching](activation_patching.md) | `probe.causal.patch(...)` | Replace selected receiver residuals with source residuals and measure the causal effect. |
-| [Ablation](ablation.md) | `probe.causal.ablate(...)` | Replace selected residual activations with zeros, a reference mean, or a reference sample. |
+| [Path Patching](path_patching.md) | `probe.causal.path(...)` | Freeze other head outputs, transfer sender outputs, then replay only recomputed receiver Q/K/V or final residual. |
 | [Attribution Patching](attribution_patching.md) | `probe.causal.attribute(...)` | Approximate a patch effect using activation differences and a receiver-side gradient. |
 | [Attention Knockout](attention_knockout.md) | `probe.causal.knockout(...)` | Block selected query-to-key attention paths before softmax. |
-| [EAP-IG (explicit edge activations)](eap_ig.md) | `probe.causal.eap_ig(...)` | Integrate gradients along a simultaneous interpolation of declared edge messages. |
+| [EAP / EAP-IG](eap_ig.md) | `probe.causal.eap_ig(graph="transformer", ...)` | Attribute independently replaceable GPT-2 edges along an input-embedding path, then evaluate retained circuits with actual forwards. |
 | [Residual Steering](steering.md) | `probe.causal.steer(...)` | Add a supplied direction to selected residuals and measure the output change. |
+| [Visual Steering Vector (VSV)](steering.md#per-image-visual-steering-vsv) | `probe.causal.vsv(positive, negative, ...)` | Build per-image residual directions from image and text-only inputs; configure a joint steering run. |
 
 ## Example setup
 
 For a downloaded VLM, start with its [model guide](../models/README.md) to obtain
 `probe` and `inputs`. For a small, fully runnable demonstration of every method,
 run this setup from the repository root after installation. Method-page snippets
-use these variables. TinyModel exposes editable attention and real edge sites,
-so it also demonstrates the four methods unavailable on native HF adapters.
+use these variables. TinyModel exposes editable attention and independently
+replaceable edge sites, including the explicit activation-space EAP-IG variant.
+Pretrained GPT-2 uses the separate original transformer-graph implementation.
 
 ```python
 import torch

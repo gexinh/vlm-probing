@@ -1,0 +1,22 @@
+[
+  {
+    "id": "author-gpt2-row-826",
+    "source_csv_row_id": "826",
+    "clean_prompt": "When Amy and Laura got a snack at the house, Laura decided to give it to",
+    "donor_prompt": "When Amy and Laura got a snack at the house, Nicholas decided to give it to",
+    "positive_id": 14235,
+    "negative_id": 16753,
+    "positive_token": " Amy",
+    "negative_token": " Laura"
+  },
+  {
+    "id": "author-gpt2-row-475",
+    "source_csv_row_id": "475",
+    "clean_prompt": "Then, Danielle and Andrew had a lot of fun at the office. Andrew gave a computer to",
+    "donor_prompt": "Then, Danielle and Andrew had a lot of fun at the office. Jeremy gave a computer to",
+    "positive_id": 39808,
+    "negative_id": 6858,
+    "positive_token": " Danielle",
+    "negative_token": " Andrew"
+  }
+]

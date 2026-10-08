@@ -63,9 +63,25 @@ class ModelMatrixTests(unittest.TestCase):
         corrupt = {**inputs, "pixel_values": -inputs["pixel_values"]}
         patched = p.causal.patch(layers=[0]).run(corrupt, source=inputs, metric=metric)
         self.assertTrue((patched.tensors["effect"].abs() > 1e-7).any(), family)
-        p.causal.ablate(layers=[0]).run(inputs, metric=metric)
+        if family == "qwen3_5":
+            self.assertFalse(p.describe()["methods"]["causal.path"]["available"])
+            with self.assertRaisesRegex(CapabilityError, "EVERY"):
+                p.causal.path(senders=[(3, 0)])
+        else:
+            for receivers in ("residual", [(1, 0, "q")], [(1, 0, "k")], [(1, 0, "v")]):
+                tokens = "visual" if isinstance(receivers, list) and receivers[0][2] in {"k", "v"} else "last_prompt"
+                path = p.causal.path(senders=[(0, 0)], receivers=receivers,
+                                     sender_tokens=tokens, receiver_tokens=tokens)
+                identity = path.run(inputs, donor=inputs, metric=metric)
+                torch.testing.assert_close(identity.tensors["effect"], torch.zeros(2))
+                effect = path.run(inputs, donor=corrupt, metric=metric)
+                self.assertTrue((effect.tensors["effect"].abs() > 1e-9).any(), (family, receivers))
         p.causal.attribute(layers=[0]).run(corrupt, source=inputs, metric=metric)
         p.causal.steer(layers=[0]).run(inputs, direction=torch.ones(16) * 0.1, metric=metric)
+        if p.spec.attention_scores:
+            knockout = p.causal.knockout(layers=sorted(p.spec.attention_scores)[:2], queries="last_prompt",
+                                         keys="visual", joint=True).run(inputs, metric=metric)
+            self.assertTrue((knockout.tensors["effect"].abs() > 1e-7).any())
         p.attention.profile().run(inputs)
         p.attention.head_logits().run(inputs)
         if family == "qwen3_5":

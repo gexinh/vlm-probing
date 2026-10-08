@@ -50,16 +50,19 @@ Use the **HF-native `-hf` checkpoint**, whose class is `InternVLForConditionalGe
 
 The official processor handles dynamic tiles and thumbnail tokens. All six lenses, four observational attention methods, and four residual causal methods are available with eager attention.
 
-Native HF attention outputs are observational. Knockout, probability reweighting,
-attention temperature, and EAP-IG require the explicit editable sites described
-in the [capability matrix](README.md#capability-matrix).
+The eager adapter exposes editable pre-softmax scores and consumed attention
+probabilities. Knockout, temperature, reweighting, and ATTATTR operate on actual
+decoder computation. Original EAP-IG remains scoped to the audited GPT-2 graph.
 
 ## Validation
 
-Validated with a tiny randomly initialized instance of this native architecture, including real image pixels, the vision tower, projector, and decoder. The named pretrained checkpoint is a loading example; its weights were not run in this release.
+Validated with a tiny randomly initialized instance including the real vision
+path, and with the named pretrained checkpoint on eight fixed GQA/MMVP/VSR/
+VisOnlyQA report cases. Readouts, attention attribution, real residual edits
+and one complete paired-image path sweep are recorded in the
+[technical report](https://github.com/gexinh/vlm-probing/releases/latest/download/vlm-probing-technical-report.pdf).
 
-See [test coverage and results](../releases/v0.3.0.md), the
-[executable matrix](../../examples/hf_model_matrix.py), and the
+See the [architecture checks](../../examples/hf_model_matrix.py) and the
 [official model implementation](https://github.com/huggingface/transformers/blob/v5.3.0/src/transformers/models/internvl/modeling_internvl.py).
 
 Next: [method guides](../methods/README.md) and [metrics/calibration](../API.md).

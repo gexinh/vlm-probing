@@ -59,6 +59,44 @@ class AdapterTests(unittest.TestCase):
         result = adapter.run({"x": torch.ones(1, 3)}, interventions={"head_in": torch.zeros_like})
         torch.testing.assert_close(result.logits, torch.zeros(1, 2))
 
+    def test_disjoint_packed_slices_preserve_other_values_and_gradients(self):
+        adapter = TorchModelAdapter(self.model, {
+            "first": HookPoint("hidden", tensor_slice=(0, 1)),
+            "rest": HookPoint("hidden", tensor_slice=(1, 3)),
+        })
+        inputs = {"x": torch.ones(1, 3)}
+        original = self.model.hidden(inputs["x"]).detach()
+        result = adapter.run(inputs, capture=["first", "rest"], interventions={
+            "first": lambda x: x * 2,
+            "rest": torch.zeros_like,
+        })
+        expected = original.clone()
+        expected[:, :1] *= 2
+        expected[:, 1:] = 0
+        torch.testing.assert_close(result.logits, self.model.head(expected))
+        torch.testing.assert_close(result.activations["first"], expected[:, :1])
+        torch.testing.assert_close(result.activations["rest"], expected[:, 1:])
+        trace = adapter.run(inputs, capture=["first", "rest"], grad=True)
+        first, rest = torch.autograd.grad(trace.logits.sum(),
+                                          [trace.activations["first"], trace.activations["rest"]])
+        torch.testing.assert_close(first, self.model.head.weight[:, :1].sum(0)[None])
+        torch.testing.assert_close(rest, self.model.head.weight[:, 1:].sum(0)[None])
+        self.assertFalse(self.model.hidden._forward_hooks)
+
+    def test_overlapping_packed_aliases_and_out_of_bounds_slices_rejected(self):
+        for points in (
+            {"whole": HookPoint("hidden"), "slice": HookPoint("hidden", tensor_slice=(0, 1))},
+            {"left": HookPoint("hidden", tensor_slice=(0, 2)),
+             "right": HookPoint("hidden", tensor_slice=(1, 3))},
+        ):
+            with self.assertRaisesRegex(ValueError, "Overlapping"):
+                TorchModelAdapter(self.model, points)
+        adapter = TorchModelAdapter(self.model, {"bad": HookPoint("hidden", tensor_slice=(0, 4))})
+        with self.assertRaisesRegex(ValueError, "exceeds"):
+            adapter.run({"x": torch.ones(1, 3)}, capture=["bad"])
+        self.assertFalse(self.model.hidden._forward_hooks)
+        self.assertFalse(adapter._active)
+
     def test_downstream_inplace_gradient_capture_rejected(self):
         class Inplace(nn.Module):
             def __init__(self):

@@ -25,7 +25,7 @@ print(result.tensors["valid_queries"])
 ## API
 
 ```text
-probe.attention.profile(*, layers=None, queries="all", groups=None)
+probe.attention.profile(*, layers=None, queries="all", groups=None, include_attention=False)
 method.run(inputs)
 ```
 
@@ -34,6 +34,7 @@ method.run(inputs)
 | `layers` | Observable attention layers; Qwen3.5 standard-attention layers only. |
 | `queries` | Common token selector for query positions. |
 | `groups` | `{name: selector}` for disjoint key groups; defaults to visual/text when a visual layout exists. |
+| `include_attention` | Also return raw `attention[L,B,H,Q,K]` for spatial maps or token-to-token comparisons. |
 
 Returns a `ProbeResult`: `entropy`, `concentration`, and `max_probability`: `[L,B,H,Q]`; `group_mass[L,B,H,Q,G]`; `valid_queries[L,B,Q]`.
 
@@ -41,6 +42,6 @@ Returns a `ProbeResult`: `entropy`, `concentration`, and `max_probability`: `[L,
 
 Requires eager attention for the native HF adapters. Empty visual groups have zero mass. Attention statistics alone do not measure causal importance.
 
-[Paper / source reference](../REFERENCES.md#visual-attention) ·
+[Paper / source reference](../REFERENCES.md#supporting-primitives) ·
 [Tensor implementation](../../src/vlm_probing/attention/profile.py) ·
 [Shared result conventions](README.md#shared-conventions)

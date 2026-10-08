@@ -34,8 +34,13 @@ Returns a `ProbeResult`: `head_logits[L,B,H,Q,V]` and `summed_logits[L,B,Q,V]`.
 
 ## Support and scope
 
-All standard-attention layers in supported models, including gated Qwen3.5 heads. No fitting is needed. Intermediate-layer scores are direct projections, not a complete decomposition of final logits. Output size scales with heads, sequence length, and vocabulary; begin with one layer and a short prompt.
+Requires an adapter-declared fixed-scale linear readout, available on the
+supported VLM standard-attention layers, including gated Qwen3.5 heads.
+The native GPT-2 adapter does not declare this affine-LayerNorm readout.
+No fitting is needed. Intermediate-layer scores are direct projections,
+not a complete decomposition of final logits. Output size scales with heads,
+sequence length, and vocabulary; begin with one layer and a short prompt.
 
-[Paper / source reference](../REFERENCES.md#head-attribution) ·
+[Paper / source reference](../REFERENCES.md#supporting-primitives) ·
 [Tensor implementation](../../src/vlm_probing/attention/head_logit_attribution.py) ·
 [Shared result conventions](README.md#shared-conventions)

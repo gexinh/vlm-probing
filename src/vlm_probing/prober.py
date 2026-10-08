@@ -61,7 +61,10 @@ class Prober:
             layout = self.spec.layout(values)
         if not isinstance(layout, TokenLayout):
             raise TypeError("layout provider must return TokenLayout")
-        return layout.checked((tensor.shape[0], tensor.shape[sequence_axis]), tensor.device)
+        shape = (tensor.shape[0], tensor.shape[sequence_axis])
+        if self.spec.output_kind == "classification" and tensor.ndim == 2:
+            shape = (tensor.shape[0], layout.valid.shape[1])
+        return layout.checked(shape, tensor.device)
 
     def _heads(self, layer, tensor):
         result = self.spec.project_heads(layer, tensor) if self.spec.project_heads else tensor
@@ -90,11 +93,20 @@ class Prober:
             "attention.profile": (sorted(s.attentions), "observable attention probabilities"),
             "attention.rollout": (propagation, "observable self-attention at consecutive layers from 0"),
             "attention.relevance": (propagation, "differentiable self-attention at consecutive layers from 0"),
+            "attention.grad_cam": (sorted(s.attentions), "differentiable target-conditioned attention"),
+            "attention.attribution": (sorted(s.editable_attention), "editable consumed probabilities for attention-path integration"),
+            "attention.tam": (propagation, "consecutive attention stack and floating input-path tensor"),
+            "attention.beyond_intuition": (propagation, "consecutive attention stack; token variant also needs pre-LN inputs and projected V"),
+            "attention.dtd_lrp": (residual if s.output_kind == "classification" and
+                                 type(self.model).__name__ == "ViTForImageClassification" else [],
+                                 "native HF ViT converted to Chefer's original-rule backend"),
             "attention.head_logits": (sorted(s.heads) if s.linear_readout else [], "projected heads and fixed-scale readout"),
             "attention.reweight": (sorted(s.editable_attention), "editable probabilities before A @ V"),
             "attention.temperature": (sorted(s.attention_scores), "editable masked attention logits"),
             "causal.patch": (residual, "residual sites"),
-            "causal.ablate": (residual, "residual sites"),
+            "causal.path": (sorted(s.path_heads) if set(s.path_heads) == set(s.residuals)
+                            and (s.path_final or s.path_qkv) else [],
+                            "editable outputs at every decoder layer and receiver Q/K/V or final residual"),
             "causal.attribute": (residual, "differentiable residual sites"),
             "causal.steer": (residual, "residual sites"),
             "causal.knockout": (sorted(s.attention_scores), "editable masked attention logits"),
@@ -103,6 +115,15 @@ class Prober:
         for name, (sites, need) in rules.items():
             methods[name] = {"available": bool(sites), "sites": sites,
                              "requires": need, "missing": None if sites else need}
+        native_gpt2 = (type(self.model).__module__ == "transformers.models.gpt2.modeling_gpt2"
+                       and type(self.model).__name__ == "GPT2LMHeadModel"
+                       and not self.model.config.add_cross_attention
+                       and not getattr(self.model.config, "reorder_and_upcast_attn", False))
+        edge_method = methods["causal.eap_ig"]
+        edge_method["graphs"] = {"activation": bool(s.edges), "transformer": native_gpt2}
+        if native_gpt2:
+            edge_method.update(available=True, missing=None,
+                               requires="graph='transformer' for the native GPT-2 residual-message graph")
         return {"model_id": self.adapter.model_id, "adapter": type(self.adapter).__name__,
                 "methods": methods, "notes": list(s.notes),
                 "layout": "adapter-provided" if s.layout else "explicit ProbeInputs required"}

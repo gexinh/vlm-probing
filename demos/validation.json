@@ -1,0 +1,56 @@
+[
+  {
+    "notebook": "activation_patching_demo.ipynb",
+    "success": true,
+    "seconds": 5.21,
+    "output_cells": 4
+  },
+  {
+    "notebook": "attention_comparison_demo.ipynb",
+    "success": true,
+    "seconds": 9.96,
+    "output_cells": 3
+  },
+  {
+    "notebook": "attention_knockout_demo.ipynb",
+    "success": true,
+    "seconds": 4.92,
+    "output_cells": 3
+  },
+  {
+    "notebook": "eap_ig_demo.ipynb",
+    "success": true,
+    "seconds": 5.09,
+    "output_cells": 5
+  },
+  {
+    "notebook": "lens_comparison_demo.ipynb",
+    "success": true,
+    "seconds": 6.76,
+    "output_cells": 4
+  },
+  {
+    "notebook": "path_patching_demo.ipynb",
+    "success": true,
+    "seconds": 5.25,
+    "output_cells": 4
+  },
+  {
+    "notebook": "steering_vsv_demo.ipynb",
+    "success": true,
+    "seconds": 9.96,
+    "output_cells": 4
+  },
+  {
+    "notebook": "vlm_attention_comparison_demo.ipynb",
+    "success": true,
+    "seconds": 7.11,
+    "output_cells": 3
+  },
+  {
+    "notebook": "vlm_lens_demo.ipynb",
+    "success": true,
+    "seconds": 7.1,
+    "output_cells": 4
+  }
+]

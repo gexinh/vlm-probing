@@ -1,4 +1,4 @@
-"""Run all 18 public factories on a real tiny decoder, without downloads.
+"""Exercise model-bound methods on a synthetic tiny decoder, without downloads.
 
     PYTHONPATH=src python examples/prober_quickstart.py
 """
@@ -39,7 +39,9 @@ def main():
 
     patched = probe.causal.patch(layers=[0, 1], tokens="visual").run(corrupt, source=clean, metric=metric)
     print("Patch effects [independent layer, batch]:", patched.tensors["effect"])
-    probe.causal.ablate(layers=[0]).run(clean, metric=metric)
+    path = probe.causal.path(senders=[(0, 0)], receivers=[(1, 0, "v")],
+                             sender_tokens="visual", receiver_tokens="visual")
+    print("Path effects [batch]:", path.run(corrupt, donor=clean, metric=metric).tensors["effect"])
     probe.causal.attribute(layers=[0]).run(corrupt, source=clean, metric=metric)
     probe.causal.knockout(layers=[0]).run(clean, metric=metric)
     probe.causal.steer(layers=[0], strength=0.1).run(clean, direction=torch.ones(6), metric=metric)
@@ -51,7 +53,14 @@ def main():
     probe.attention.head_logits(layers=[1]).run(clean)
     probe.attention.reweight(layers=[0], weight=2.).run(clean, metric=metric)
     probe.attention.temperature(layers=[0], temperature=0.7).run(clean, metric=metric)
-    print("All 18 model-bound methods completed.")
+    probe.attention.grad_cam(layers=[1], keys="visual").run(clean, metric=metric)
+    probe.attention.attribution(layers=[1], steps=4).run(clean, metric=metric)
+    # This synthetic model receives image embeddings, rather than raw pixels.
+    # The integration path is explicitly an embedding-space method transfer.
+    probe.attention.tam(steps=4, input_key="image_tokens").run(clean, metric=metric)
+    probe.attention.beyond_intuition(variant="head", steps=4, input_key="image_tokens").run(
+        clean, metric=metric)
+    print("Core methods and attention-map calls completed; DTD uses the separate ViT backend.")
 
 
 if __name__ == "__main__":

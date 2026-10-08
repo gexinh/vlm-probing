@@ -1,5 +1,6 @@
 """Attention observation and real value-path interventions."""
 import torch
+from .attention_maps import AttentionMapProbe
 
 from .. import attention as kernels
 from ..adapters import CapabilityError
@@ -61,6 +62,8 @@ class AttentionProbe(BoundMethod):
                     matrix, groups={k: v.to(matrix.device) for k, v in group_masks.items()},
                     query_mask=layout.select(o["queries"]).to(matrix.device),
                     key_mask=layout.valid.to(matrix.device))
+                if o.get("include_attention", False):
+                    result.tensors["attention"] = matrix
                 results.append(result)
         elif name == "head_logits":
             full = trace.activations[final_site]
@@ -99,9 +102,79 @@ class AttentionMethods:
     def __init__(self, probe):
         self.probe = probe
 
-    def profile(self, *, layers=None, queries="all", groups=None):
+    def profile(self, *, layers=None, queries="all", groups=None, include_attention=False):
         return AttentionProbe(self.probe, "profile", layers_for(self.probe, layers, "attentions"),
-                              queries=queries, groups=groups)
+                              queries=queries, groups=groups, include_attention=include_attention)
+
+    def grad_cam(self, *, layers=None, queries=None, keys=None, normalize=False):
+        """Grad-CAM on attention query rows; adaptation of the original feature CAM."""
+        queries, keys = self._map_selection(queries, keys)
+        return AttentionMapProbe(self.probe, "grad_cam", layers_for(self.probe, layers, "attentions"),
+                                 queries=queries, keys=keys, normalize=normalize)
+
+    def attribution(self, *, layers=None, queries=None, keys=None, steps=20, quadrature="right"):
+        """Hao attention IG: independently integrate each layer from zero A to A."""
+        self._integration(steps, quadrature)
+        queries, keys = self._map_selection(queries, keys)
+        chosen = layers_for(self.probe, layers, "attentions")
+        if not set(chosen) <= self.probe.spec.editable_attention:
+            raise CapabilityError("Attention Attribution requires consumed editable probabilities before A @ V")
+        return AttentionMapProbe(self.probe, "attribution", chosen, queries=queries, keys=keys,
+                                 steps=steps, quadrature=quadrature)
+
+    def tam(self, *, layers=None, queries=None, keys=None, steps=20,
+            quadrature="right", input_key="pixel_values", start_layer=0, residual_normalize=True):
+        """TAM's backward Markov transitions and input-path final-attention feedback."""
+        return self._input_map("tam", layers, queries, keys, steps, quadrature, input_key, start_layer,
+                               residual_normalize=residual_normalize)
+
+    def beyond_intuition(self, *, variant="head", layers=None, queries=None, keys=None,
+                         steps=20, quadrature="right", input_key="pixel_values", start_layer=0):
+        """Beyond Intuition headwise/tokenwise perception with input-path feedback."""
+        if variant not in {"head", "token"}:
+            raise ValueError("variant must be head or token")
+        if variant == "token":
+            spec = self.probe.spec
+            require(spec.project_values, "token variant requires an explicit no-bias V/output projection")
+            chosen = self._propagation_layers(layers)
+            if not set(chosen) <= spec.attention_inputs.keys() & spec.attention_values.keys():
+                raise CapabilityError("token variant requires pre-LN input and V captures at every selected layer")
+        return self._input_map("beyond_intuition", layers, queries, keys, steps, quadrature,
+                               input_key, start_layer, variant=variant)
+
+    def dtd_lrp(self, *, method="transformer_attribution", start_layer=0, device=None):
+        """Use Chefer's original-rule ViT backend with copied caller-owned weights."""
+        from ..attention import CheferLRP, create_chefer_vit
+        model = create_chefer_vit(source=self.probe.model)
+        if device is not None:
+            model = model.to(device)
+        return CheferLRP(model, method=method, start_layer=start_layer, result_device=self.probe.result_device)
+
+    @staticmethod
+    def _integration(steps, quadrature):
+        if type(steps) is not int or steps < 1:
+            raise ValueError("steps must be a positive integer")
+        if quadrature not in {"left", "right", "endpoints"}:
+            raise ValueError("quadrature must be left, right, or endpoints")
+        if quadrature == "endpoints" and steps < 2:
+            raise ValueError("endpoint-inclusive integration requires steps >= 2")
+
+    def _input_map(self, name, layers, queries, keys, steps, quadrature, input_key, start_layer, **extra):
+        self._integration(steps, quadrature)
+        queries, keys = self._map_selection(queries, keys)
+        chosen = self._propagation_layers(layers)
+        if type(start_layer) is not int or not 0 <= start_layer < len(chosen):
+            raise ValueError("start_layer must be inside the selected consecutive stack")
+        if not isinstance(input_key, str) or not input_key:
+            raise ValueError("input_key must name a floating processed-input tensor")
+        return AttentionMapProbe(self.probe, name, chosen, queries=queries, keys=keys,
+                                 steps=steps, quadrature=quadrature, input_key=input_key,
+                                 start_layer=start_layer, **extra)
+
+    def _map_selection(self, queries, keys):
+        vision = self.probe.spec.output_kind == "classification"
+        return (([0] if vision else "last_prompt") if queries is None else queries,
+                ("visual" if vision else "all") if keys is None else keys)
 
     def rollout(self, *, layers=None, head_reduction="mean", residual=True):
         return AttentionProbe(self.probe, "rollout", self._propagation_layers(layers),

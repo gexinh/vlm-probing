@@ -37,6 +37,6 @@ Returns a `ProbeResult`: Final `rollout[B,T,T]` and `layer_rollouts[L,B,T,T]`.
 
 Requires eager self-attention. Unavailable on Qwen3.5-4B because linear-attention gaps cannot be skipped. It summarizes attention transitions and omits values, MLPs, and visual injection edges.
 
-[Paper / source reference](../REFERENCES.md#rollout) ·
+[Paper / source reference](../REFERENCES.md#attention-methods) ·
 [Tensor implementation](../../src/vlm_probing/attention/rollout.py) ·
 [Shared result conventions](README.md#shared-conventions)

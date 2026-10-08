@@ -22,6 +22,10 @@ def auto_adapter(model):
     factory = getattr(model, "probing_adapter", None)
     if callable(factory):
         return factory()
+    if (type(model).__module__, type(model).__name__) == (
+            "transformers.models.vit.modeling_vit", "ViTForImageClassification"):
+        from .vit import make_adapter
+        return make_adapter(model)
     from .huggingface import MODEL_CONTRACTS, make_adapter
     if (type(model).__module__, type(model).__name__) in MODEL_CONTRACTS:
         return make_adapter(model)

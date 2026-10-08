@@ -18,7 +18,7 @@ model = AutoModelForImageTextToText.from_pretrained(
     model_id, dtype=torch.bfloat16, device_map={"": "cuda:0"},
     attn_implementation="eager",
 )
-processor = AutoProcessor.from_pretrained(model_id)
+processor = AutoProcessor.from_pretrained(model_id, use_fast=False)
 probe = Prober(model, processor)
 
 messages = [{"role": "user", "content": [
@@ -48,18 +48,27 @@ small checkpoint/configuration instead of the CUDA/bf16 settings above.
 
 Supports the native `LlavaForConditionalGeneration` class with a Llama text backbone. The processor must expand each image placeholder to the actual visual token sequence. Legacy unexpanded input layouts are not inferred or silently remapped.
 
-All six lenses, four observational attention methods, and four residual causal methods are available with eager attention. This is the classic LLaVA family; LLaVA-NeXT, OneVision, and original remote-code wrappers have different contracts and are not registered under this adapter.
+Lens readouts, observational attention maps, and residual causal methods are available with eager attention. This is the classic LLaVA family; LLaVA-NeXT, OneVision, and original remote-code wrappers have different contracts and are not registered under this adapter.
 
-Native HF attention outputs are observational. Knockout, probability reweighting,
-attention temperature, and EAP-IG require the explicit editable sites described
-in the [capability matrix](README.md#capability-matrix).
+Transformers 5.3 eager Llama attention exposes audited, weight-free masked-score
+and consumed-probability taps. These enable knockout, temperature, probability
+reweighting and attention-space integrated attribution. Original input-path EAP-IG
+has an audited GPT-2 graph, with VLM graph support requiring further validation.
+See the [capability matrix](README.md#capability-matrix).
+
+Grad-CAM, TAM and Beyond Intuition are target-conditioned method transfers at
+language-decoder attention sites. They do not constitute full-model DTD/LRP;
+the original-rule DTD backend is scoped to the [ViT control](vit.md).
 
 ## Validation
 
-Validated with a tiny randomly initialized instance of this native architecture, including real image pixels, the vision tower, projector, and decoder. The named pretrained checkpoint is a loading example; its weights were not run in this release.
+Validated with a tiny randomly initialized instance including real image pixels,
+the vision tower, projector, and decoder. The pretrained 7B checkpoint was also
+run on two GQA attribute questions and two COCO 2014 captioning examples. See
+the executed [Attention Knockout](../../demos/attention_knockout_demo.ipynb)
+and [Steering / VSV](../../demos/steering_vsv_demo.ipynb) notebooks.
 
-See [test coverage and results](../releases/v0.3.0.md), the
-[executable matrix](../../examples/hf_model_matrix.py), and the
+See the [architecture checks](../../examples/hf_model_matrix.py) and the
 [official model implementation](https://github.com/huggingface/transformers/blob/v5.3.0/src/transformers/models/llava/modeling_llava.py).
 
 Next: [method guides](../methods/README.md) and [metrics/calibration](../API.md).

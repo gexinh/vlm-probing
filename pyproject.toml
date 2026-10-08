@@ -4,14 +4,19 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "vlm-probing"
-version = "0.3.0"
-description = "Model-bound lens, attention, and causal probes for vision-language models"
+version = "0.8.0"
+description = "Lens, attention, and causal probes for language, vision, and vision-language models"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = ["torch>=2.2"]
 
 [project.optional-dependencies]
+visualization = ["matplotlib>=3.8", "Pillow>=10", "numpy>=1.26"]
 transformers = ["transformers>=5.3,<5.4", "torch>=2.4", "torchvision>=0.19", "accelerate>=1.0", "Pillow>=10"]
+notebooks = ["jupyterlab>=4", "nbclient>=0.10", "matplotlib>=3.8", "Pillow>=10", "numpy>=1.26", "tokenizers>=0.22"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+"vlm_probing._vendor.chefer2021" = ["LICENSE", "README.md"]

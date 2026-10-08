@@ -54,14 +54,49 @@ including any visual injection after block `i`.
 | `tokens="all"` | All valid positions. |
 | `tokens="visual"` / `"text"` | Positions selected by the adapter's visual mask or its valid complement. |
 | `tokens="last_prompt"` | Last prompt position, or last valid position if no prompt mask exists. |
+| `tokens="prediction"` | Last original prompt position plus valid generated positions outside `layout.prompt`; used for generation-step steering. |
 | `tokens=4` / `[4, 5]` | Expanded sequence positions, valid in every batch example. |
 | `tokens=boolean_mask` | Explicit `[batch, expanded_sequence]` selection, excluding padding. |
 
 `queries` and `keys` use the same selector conventions. Residual interventions
-at multiple layers are separate experiments; they do not compound edits across
-layers. Rollout and relevance instead compose consecutive attention layers.
+at multiple layers are separate experiments by default. Steering and knockout
+accept `joint=True` to edit all selected live sites together. Rollout and
+relevance compose consecutive attention layers.
+
+### Joint interventions and generation
+
+```python
+window = list(range(8, 17))  # nine layers, center 12
+effect = probe.causal.knockout(
+    layers=window, queries=question_mask, keys=visual_mask, joint=True,
+).run(inputs, metric=metric)
+
+vsv = probe.causal.vsv(image_inputs, same_text_without_image)
+steering = vsv.configure(strength=0.17, tokens="prediction")
+caption = steering.generate(image_inputs, direction=vsv.directions,
+                            max_new_tokens=144, do_sample=False)
+```
+
+Joint `.run` returns one score per batch item, rather than a stack of separate
+layer effects. `.forward(..., capture=[site, ...])` executes only the live
+intervention forward and returns a `ForwardTrace`. Joint steering also provides
+uncached greedy `.generate` for one unpadded example. Image placeholders must
+already be expanded. `prediction` fixes the original prompt boundary and
+reapplies edits to all prior generation positions in each full-prefix replay.
+Teacher-forced analyses must set `TokenLayout.prompt` to that same boundary.
+Outputs include `generated_ids`, `fullsequence_ids`, and `decoded_text` metadata.
+
+Original EAP-IG is configured with `probe.causal.eap_ig(graph="transformer", steps=5)`;
+the native GPT-2 provider supports input-embedding integration and actual
+complement-edge circuit evaluation. `graph="activation"` retains the explicitly
+declared edge-message interpolation variant. See the [method guide](methods/eap_ig.md).
 
 ## Metrics and explicit layouts
+
+For a ViT vision-classification control, use `ClassScore(class_id)` on the
+native `[B,C]` logits. It supports `kind="logit"` or `"probability"` and keeps
+patch coordinates separate from the output-class axis. See [ViT](models/vit.md)
+and the [attention-map interfaces](methods/attention_maps.md).
 
 For single-token candidate answers:
 
@@ -101,8 +136,48 @@ with `score(logits, layout)`. Preserve the graph for gradient methods.
 `alignment="strict"` checks valid/visual/prompt masks, expanded token IDs, and
 adapter-declared grid/position metadata. Source and receiver use identical
 coordinates. For intentionally changed text with verified positional alignment,
-`alignment="position"` relaxes only token-ID equality. General position remapping
-is not implemented. Use independent reference data for ablation controls.
+`alignment="position"` relaxes only token-ID equality. Residual patching does not
+remap positions. Path patching can map selected donor sender positions onto
+selected base sender positions within an otherwise structurally aligned batch.
+
+### Controlled paths
+
+```python
+path = probe.causal.path(
+    senders=[(0, 0)], receivers=[(1, 0, "v")],
+    sender_tokens="visual", receiver_tokens="visual",
+)
+result = path.run(corrupt, donor=clean, metric=metric)
+```
+
+This executes base, donor, controlled, and receiver-only forwards. It freezes
+every attention-head output in the controlled run, then replaces only the chosen
+sender positions with donor values. MLPs and normalization recompute; receiver
+Q/K/V is cached independently of its frozen head output. `receivers="residual"`
+selects the final residual before readout normalization. Multiple endpoints form
+one joint intervention with `.run()`. Use `.sweep()` to measure each sender
+independently through the configured receiver set:
+
+```python
+senders = [(layer, head) for layer, point in sorted(probe.spec.path_heads.items())
+           for head in range(point.heads)]
+result = probe.causal.path(senders=senders, receivers="residual").sweep(
+    clean, donor=corrupt, metric=metric, alignment="position",
+)
+print(result.tensors["effect"].shape)  # [independent paths, batch]
+```
+
+The sweep shares the unmodified base/donor caches, while running both controlled
+and receiver-only forwards for every sender. It executes `2 + 2N` forwards for
+`N` paths and preserves the same intervention rules as individual `.run()` calls.
+An optional `progress(completed, total, sender)` callback reports each completed
+path. The [notebook](../demos/path_patching_demo.ipynb) adds dataset preparation,
+per-example normalization, plotting, and saved experiment metadata.
+
+`donor_tokens` defaults to `sender_tokens`; explicit masks can select different
+role positions in each example, with equal selected counts per pair. Receiver
+injection always uses base coordinates. K/V indices name physical KV heads in
+GQA. See the [method guide](methods/path_patching.md) for scope and model support.
 
 ## Fitted-lens artifacts
 
@@ -126,9 +201,22 @@ result = restored.run(evaluation_inputs)
 `fit` accepts one batch; `fit` and `load` return the bound object. Tuned/Attention
 retain weights across repeated fits but restart optimizers; their losses are
 available in `.losses[layer]`. Jacobian fitting replaces the transport estimate.
+For dataset calibration, use `.fit_batches(train_inputs, validation_inputs,
+directory, ...)`: it caches inputs once, keeps Adam across minibatches, validates
+each epoch and saves resumable optimizer state. Inspect `.training_history[layer]`.
+The [training guide](TRAINING.md) covers this interface, disk-backed readouts,
+the validated author-checkpoint importer and grouped Jacobian estimation.
 Artifact saving requires explicit identities and writes one file per layer.
 Loading validates the binding and dimensions. These files use this library's
 format, not a third-party lens checkpoint format.
+
+To reproduce the released Attention Lens initialization, new head decoders can
+use `head = model.get_output_embeddings()` followed by
+`.fit(calibration_inputs, initial_unembedding=head.weight,
+initial_bias=getattr(head, "bias", None), ...)`. The weight shape is `[V,D_residual]`;
+the optional bias is `[V]`. No final LayerNorm is inserted into head decoders.
+Supplying these options to an already fitted/loaded lens raises an error,
+preventing an accidental reset. See the [training guide](TRAINING.md).
 
 ## Results and persistence
 
@@ -141,12 +229,20 @@ Outputs are detached and moved to `result_device` (CPU by default).
 | Embed | `token_ids[1,N,K]`, `similarities[1,N,K]`, norms and positions |
 | Attention Lens | `head_logits[L,N,H,V]`, summed logits and positions |
 | Patchscope | Target `logits[L,B,T_target,V]` |
-| Exact interventions | Baseline/intervention scores and effect: `[L,B]` or `[L]` |
+| Exact layer interventions | Baseline/intervention scores and effect: `[L,B]` or `[L]` |
+| Joint steering / knockout | Baseline/intervention scores and effect: `[B]` or scalar |
+| Path patching | Baseline/donor/intervention scores and effect: `[B]` or scalar; joint endpoint set |
+| Path patching `.sweep()` | Shared baseline/donor `[B]`; intervention/effect `[N,B]`; `senders[N,2]`. Scalar metrics omit the batch axis. |
 | Attribution patching | `token_scores[L,B,T]`, batch-summed `estimated_effect[L]` |
-| EAP-IG | `edge_scores[E]`, scalar endpoints/effect/completeness error |
+| EAP-IG, activation graph | `edge_scores[E]`, scalar endpoints/effect/completeness error |
+| EAP-IG, transformer graph | `edge_scores[E]`, `eap_scores[E]`, endpoint scores, edge indices; actual recovery curves from `.evaluate` |
 | Attention profile | `entropy[L,B,H,Q]`, `group_mass[L,B,H,Q,G]` |
 | Head logit attribution | `head_logits[L,B,H,Q,V]`, `summed_logits[L,B,Q,V]` |
 | Rollout / relevance | Final `[B,T,T]` and intermediate `[L,B,T,T]` matrices |
+| Attention Grad-CAM | `cam[L,B,Q,K]`, `head_weights[L,B,H,Q]`, selected query/key masks |
+| Attention Attribution | Signed `attribution[L,B,H,Q,K]`, summed head/token scores |
+| TAM / Beyond Intuition | Final `map[B,T,T]`, perception/state and integrated feedback |
+| Chefer DTD | Class logits/targets, real LRP CAMs/gradients and spatial `patch_relevance[B,H_patch,W_patch]` |
 
 `N` packs selected positions in batch/token order. Layer indices, configuration,
 and provenance are recorded in metadata.

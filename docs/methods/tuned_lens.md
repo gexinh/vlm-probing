@@ -30,6 +30,7 @@ restored = probe.lens.tuned(layers=[0], binding=binding).load("outputs/tuned")
 ```text
 probe.lens.tuned(*, layers=None, tokens="last_prompt", binding=None)
 method.fit(inputs, *, steps=100, lr=1e-3)
+method.fit_batches(train_inputs, validation_inputs, directory, **training_options)
 method.run(inputs)
 method.save(directory)
 method.load(directory)
@@ -45,8 +46,16 @@ Returns a `ProbeResult`: `logits[L,N,V]`, `positions[N,2]`, and calibration loss
 
 ## Support and scope
 
-All seven VLM adapters. `fit` accepts one batch; repeated calls retain translators but restart the optimizer. Use held-out data to measure calibration quality. See [artifact identity](../API.md#fitted-lens-artifacts).
+Supported language-model residual sites and all eight VLM families. `fit` accepts one batch; repeated calls retain translators but restart the optimizer. Use held-out data to measure calibration quality. See [artifact identity](../API.md#fitted-lens-artifacts).
 
-[Paper / source reference](../REFERENCES.md#tuned-lens) ·
+Use `fit_batches` for persistent Adam, validation and resume across a dataset;
+see the [training guide](../TRAINING.md). The
+[text notebook](../../demos/lens_comparison_demo.ipynb) displays readouts from
+verified author GPT-2 weights. The [VLM notebook](../../demos/vlm_lens_demo.ipynb)
+uses separately trained LLaVA translators and independent GQA examples.
+Both replay saved measurements by default; loading compatible artifacts is
+an explicit model-rerun option.
+
+[Paper / source reference](../REFERENCES.md#lens-methods) ·
 [Tensor implementation](../../src/vlm_probing/lenses/tuned.py) ·
 [Shared result conventions](README.md#shared-conventions)

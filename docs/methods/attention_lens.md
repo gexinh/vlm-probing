@@ -6,7 +6,7 @@ Train separate vocabulary decoders for individual attention heads.
 
 ## Implementation
 
-Capture each head immediately before `o_proj`, then project its contribution into residual coordinates. Train per-head affine vocabulary decoders jointly so the sum of their logits matches the model output distribution by KL divergence. The public decoder starts randomly; fixed unembedding attribution is a separate method.
+Capture each head immediately before `o_proj`, then project its contribution into residual coordinates. Train per-head affine vocabulary decoders jointly so the sum of their logits matches the model output distribution by KL divergence. Decoders start randomly by default; passing the native output-head weights reproduces the released author's initialization. Fixed unembedding attribution is a separate method.
 
 ## Example
 
@@ -28,6 +28,7 @@ print(lens.losses[layer][-1])
 ```text
 probe.lens.attention(*, layers=None, tokens="last_prompt", binding=None)
 method.fit(inputs, *, steps=100, lr=1e-3)
+method.fit_batches(train_inputs, validation_inputs, directory, **training_options)
 method.run(inputs)
 method.save(directory)
 method.load(directory)
@@ -44,8 +45,15 @@ Returns a `ProbeResult`: `head_logits[L,N,H,V]`, summed `logits[L,N,V]`, and `po
 
 ## Support and scope
 
-Use the small CPU example to try calibration. Dense decoder storage is approximately `H * D_residual * V` parameters per layer, before gradients and optimizer state; full-vocabulary calibration on Qwen3.5-4B is expensive. This release does not provide compressed decoders or pretrained lens artifacts. Qwen3.5 captures gated head values.
+Use the small CPU example to try calibration. Dense decoder storage is approximately `H * D_residual * V` parameters per layer, before gradients and optimizer state; full-vocabulary calibration on Qwen3.5-4B is expensive. No compressed-decoder substitute is used. Qwen3.5 captures gated head values.
 
-[Paper / source reference](../REFERENCES.md#attention-lens) ·
+The [text notebook](../../demos/lens_comparison_demo.ipynb) displays measured
+readouts from trained GPT-2 decoders at layers 7 and 10, including every head.
+Its default replay needs no weights; an opt-in rerun requires matching artifacts.
+See the [training guide](../TRAINING.md) for persistent minibatch optimization,
+validation and resuming. The demo records a 4,096-context calibration fit,
+512 independent validation contexts, and the matching artifact identities.
+
+[Paper / source reference](../REFERENCES.md#lens-methods) ·
 [Tensor implementation](../../src/vlm_probing/lenses/attention.py) ·
 [Shared result conventions](README.md#shared-conventions)

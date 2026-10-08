@@ -5,8 +5,8 @@ import unittest
 import torch
 
 from vlm_probing.causal import (
-    Ablation, ActivationPatching, AttentionKnockout, AttributionPatching,
-    BaseCausal, EAPIG, Steering,
+    ActivationPatching, AttentionKnockout, AttributionPatching,
+    BaseCausal, EAPIG, PathPatching, Steering,
 )
 
 
@@ -19,7 +19,7 @@ class CausalTests(unittest.TestCase):
     def test_family_is_abstract_and_concrete_methods_share_it(self):
         with self.assertRaises(TypeError):
             BaseCausal()
-        for cls in (Ablation, ActivationPatching, AttentionKnockout,
+        for cls in (PathPatching, ActivationPatching, AttentionKnockout,
                     AttributionPatching, EAPIG, Steering):
             self.assertIsInstance(cls(), BaseCausal)
 
@@ -46,7 +46,6 @@ class CausalTests(unittest.TestCase):
         torch.testing.assert_close(self.source, source)
         self.assertFalse(result.metadata["effect_measured"])
         self.assertNotIn("effect", result.tensors)
-        Ablation().run(self.receiver, mask=self.mask)
         Steering().run(self.receiver, torch.tensor([1.0, -1.0]), mask=self.mask)
         torch.testing.assert_close(self.receiver, original)
 
@@ -59,19 +58,6 @@ class CausalTests(unittest.TestCase):
             ActivationPatching().run(self.receiver, self.source, mask=torch.ones(1))
         with self.assertRaises(ValueError):
             ActivationPatching().run(self.receiver, self.source, mask=torch.ones(3, dtype=torch.bool))
-
-    def test_ablation_controls_require_reference_and_preserve_other_tokens(self):
-        zero = Ablation().run(self.receiver, mask=self.mask).tensors["edited"]
-        torch.testing.assert_close(zero[:, 0], torch.zeros_like(zero[:, 0]))
-        torch.testing.assert_close(zero[:, 1], self.receiver[:, 1])
-        references = torch.cat([self.source, self.source + 2], dim=0)
-        mean = Ablation().run(self.receiver, mode="mean", reference=references)
-        torch.testing.assert_close(mean.tensors["edited"], self.source + 1)
-        sampled = Ablation().run(self.receiver, mode="resample", reference=self.source)
-        torch.testing.assert_close(sampled.tensors["edited"], self.source)
-        for mode in ("mean", "resample"):
-            with self.assertRaises(ValueError):
-                Ablation().run(self.receiver, mode=mode)
 
     def test_attention_knockout_changes_value_aggregation_and_merges_masks(self):
         logits = torch.tensor([[0.0, 0.0, float("-inf")]])

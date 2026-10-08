@@ -1,0 +1,121 @@
+{
+  "dataset": "COCO 2014 val",
+  "author_records_url": "https://raw.githubusercontent.com/LzVv123456/VISTA/main/pope_coco/coco_pope_random.json",
+  "author_records_sha256": "c16b65d2df6d70bb0814c8a4375833d39cdb09928fd936d3fc546491efa37f35",
+  "paper": "https://arxiv.org/html/2502.03628v2",
+  "samples": [
+    {
+      "image_id": 310196,
+      "file": "COCO_val2014_000000310196.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2014/COCO_val2014_000000310196.jpg",
+      "sha256": "0dcc39d91764e59e0e01c11b92ec31320f094a87ca2dce5e0c56c4f1a361daf4",
+      "size": [
+        640,
+        427
+      ],
+      "author_pope_records": [
+        {
+          "question_id": 1,
+          "image": "COCO_val2014_000000310196.jpg",
+          "text": "Is there a snowboard in the image?",
+          "label": "yes"
+        },
+        {
+          "question_id": 2,
+          "image": "COCO_val2014_000000310196.jpg",
+          "text": "Is there a car in the image?",
+          "label": "no"
+        },
+        {
+          "question_id": 3,
+          "image": "COCO_val2014_000000310196.jpg",
+          "text": "Is there a person in the image?",
+          "label": "yes"
+        },
+        {
+          "question_id": 4,
+          "image": "COCO_val2014_000000310196.jpg",
+          "text": "Is there a sandwich in the image?",
+          "label": "no"
+        },
+        {
+          "question_id": 5,
+          "image": "COCO_val2014_000000310196.jpg",
+          "text": "Is there a skis in the image?",
+          "label": "yes"
+        },
+        {
+          "question_id": 6,
+          "image": "COCO_val2014_000000310196.jpg",
+          "text": "Is there a couch in the image?",
+          "label": "no"
+        }
+      ],
+      "origin": "COCO 2014 validation, referenced by author released POPE random records; not claimed identical to paper Figure 15"
+    },
+    {
+      "image_id": 210789,
+      "file": "COCO_val2014_000000210789.jpg",
+      "image_url": "https://s3.amazonaws.com/images.cocodataset.org/val2014/COCO_val2014_000000210789.jpg",
+      "sha256": "86d17cae625d00c9e8dfd08f5bf04e1fd66120bd6cde931ebd1e0ef6962affc7",
+      "size": [
+        369,
+        520
+      ],
+      "author_pope_records": [
+        {
+          "question_id": 7,
+          "image": "COCO_val2014_000000210789.jpg",
+          "text": "Is there a truck in the image?",
+          "label": "yes"
+        },
+        {
+          "question_id": 8,
+          "image": "COCO_val2014_000000210789.jpg",
+          "text": "Is there a pizza in the image?",
+          "label": "no"
+        },
+        {
+          "question_id": 9,
+          "image": "COCO_val2014_000000210789.jpg",
+          "text": "Is there a person in the image?",
+          "label": "yes"
+        },
+        {
+          "question_id": 10,
+          "image": "COCO_val2014_000000210789.jpg",
+          "text": "Is there a sink in the image?",
+          "label": "no"
+        },
+        {
+          "question_id": 11,
+          "image": "COCO_val2014_000000210789.jpg",
+          "text": "Is there an umbrella in the imange?",
+          "label": "yes"
+        },
+        {
+          "question_id": 12,
+          "image": "COCO_val2014_000000210789.jpg",
+          "text": "Is there a cell phone in the image?",
+          "label": "no"
+        }
+      ],
+      "origin": "COCO 2014 validation, referenced by author released POPE random records; not claimed identical to paper Figure 15"
+    }
+  ],
+  "author_repository_revision": "efcf499919e066755e7c33778fbfd864c204329c",
+  "author_code_references": {
+    "steering_vector.py": {
+      "url": "https://github.com/LzVv123456/VISTA/blob/efcf499919e066755e7c33778fbfd864c204329c/steering_vector.py",
+      "sha256": "b118dc1f569b0cfa41b295bb93b6e0e19dc792dc4d01b33e3e00c3433102c473"
+    },
+    "llm_layers.py": {
+      "url": "https://github.com/LzVv123456/VISTA/blob/efcf499919e066755e7c33778fbfd864c204329c/llm_layers.py",
+      "sha256": "c554af3e71f939159ab45c79f2155e33d3f9072ecee524a663eb78849fdf00f2"
+    },
+    "chair_eval.py": {
+      "url": "https://github.com/LzVv123456/VISTA/blob/efcf499919e066755e7c33778fbfd864c204329c/chair_eval.py",
+      "sha256": "ad1300e0a6a5be984d26f193ff668561ed71ccae71b66fe9ef630dbcf25baf70"
+    }
+  }
+}

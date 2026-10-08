@@ -5,3 +5,53 @@ build/
 dist/
 .venv/
 outputs/
+/outputs
+/results/
+.ipynb_checkpoints/
+
+# Local papers, experiment archives, and presentation/report build trees.
+/paper
+/papers/
+/research/
+/report/
+/slides/
+/docs/research/
+/docs/report/
+/docs/slides/
+/docs/assets/attention_comparison/
+/docs/assets/attention_knockout/
+/docs/assets/attention_maps/
+/docs/assets/eap_ig/
+/docs/assets/lens_comparison/
+/docs/assets/path_patching/
+/docs/assets/steering_vsv/
+/docs/assets/vlm_attention_comparison/
+/docs/assets/vlm_lens/
+
+# Historical experiment and publication scripts remain available locally.
+/examples/*_demo.ipynb
+/examples/*_demo_utils.py
+/examples/data/
+/examples/path_patching_*.py
+/examples/audit_figure2_readout.py
+/examples/build_library_slides*.py
+/examples/build_technical_report.py
+/examples/export_report_results.py
+/examples/prepare_*_data.py
+/examples/prepare_report_datasets.py
+/examples/render_*report*.py
+/examples/render_slides_*.py
+/examples/run_report_*.py
+/examples/run_text_lenses.py
+/examples/train_report_*.py
+/examples/train_vlm_tuned.py
+
+# Publication contains one library release note, not old experiment revisions.
+/docs/releases/*
+!/docs/releases/v0.3.0.md
+!/docs/releases/library-v0.8.0.md
+
+# Notebook reruns and downloaded artifacts are not source assets.
+/demos/outputs/
+/demos/cache/
+/demos/checkpoints/

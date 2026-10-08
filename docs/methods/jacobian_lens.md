@@ -45,8 +45,15 @@ Returns a `ProbeResult`: `transported[L,N,D_final]`, `logits[L,N,V]`, and `posit
 
 ## Support and scope
 
-All seven VLM adapters. Exact fitting needs one backward pass per final hidden dimension, so the small CPU example is the starting point. Repeated `fit` replaces the estimate. Do not fit under `torch.inference_mode()`. The transport is linear and has no fitted intercept; it is not a full nonlinear causal explanation.
+Supported language-model residual sites and all eight VLM families. Exact fitting needs derivatives for every final hidden dimension; one-batch `fit` uses scalar backward loops. Repeated `fit` replaces the estimate. Do not fit under `torch.inference_mode()`. The transport is linear and has no fitted intercept; it is not a full nonlinear causal explanation.
 
-[Paper / source reference](../REFERENCES.md#jacobian-lens) ·
+`vlm_probing.training.fit_jacobian_lenses` groups exact basis-vector VJPs,
+merges prompt-weighted estimates across batches and saves resumable state.
+See the [training guide](../TRAINING.md) and
+[text notebook](../../demos/lens_comparison_demo.ipynb), which displays
+independent IOI readouts from an all-layer 256-context calibration. Default
+replay uses saved measurements; a model rerun requires its matching artifact.
+
+[Paper / source reference](../REFERENCES.md#lens-methods) ·
 [Tensor implementation](../../src/vlm_probing/lenses/jacobian.py) ·
 [Shared result conventions](README.md#shared-conventions)

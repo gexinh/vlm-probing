@@ -34,7 +34,11 @@ class AttentionKnockout(BaseCausal):
             raise ValueError("logits may contain finite values or negative infinity only")
         selected = selection_mask(logits, blocked)
         edited = logits.masked_fill(selected, float("-inf"))
-        if not torch.isfinite(edited).any(dim=-1).all():
+        # Native HF causal/padding masks use dtype-min as well as -inf. Treat
+        # that reserved sentinel as forbidden: otherwise blocking every legal
+        # key could accidentally softmax over masked future positions.
+        legal = torch.isfinite(edited) & edited.ne(torch.finfo(logits.dtype).min)
+        if not legal.any(dim=-1).all():
             raise ValueError("knockout leaves at least one query row with no legal key")
         return self._intervention_result(
             logits, edited, selected, runner=runner,

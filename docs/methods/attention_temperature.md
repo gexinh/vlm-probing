@@ -35,8 +35,12 @@ Returns a `ProbeResult`: `baseline_score`, `intervention_score`, and `effect`, s
 
 ## Support and scope
 
-Requires a custom masked-logit intervention site; the CPU example provides one. Native HF adapters do not expose this site. This is attention temperature, not token-sampling temperature, and is a generic intervention primitive.
+Requires a masked-logit intervention site. Audited eager Llama, Mistral,
+Qwen2, Qwen2-VL, Qwen2.5-VL, Qwen3-VL and Qwen3.5 full-attention blocks
+provide native score taps; the ViT and small CPU adapters also expose them.
+Check `probe.describe()` for the supplied model. This is attention temperature,
+not token-sampling temperature, and has no unique originating paper.
 
-[Paper / source reference](../REFERENCES.md#generic-primitives) ·
+[Paper / source reference](../REFERENCES.md#supporting-primitives) ·
 [Tensor implementation](../../src/vlm_probing/attention/temperature.py) ·
 [Shared result conventions](README.md#shared-conventions)

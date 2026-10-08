@@ -50,16 +50,20 @@ Residual layer `i` is captured after its DeepStack visual addition, at the next 
 
 Profiles and head lenses inspect language self-attention. Rollout/relevance summarize those attention paths; they do not model the extra DeepStack injection edges. Image grids are included in clean/corrupt alignment checks.
 
-Native HF attention outputs are observational. Knockout, probability reweighting,
-attention temperature, and EAP-IG require the explicit editable sites described
-in the [capability matrix](README.md#capability-matrix).
+The eager adapter supplies editable pre-softmax scores and consumed attention
+probabilities. Knockout, temperature, reweighting, and ATTATTR therefore operate
+on actual decoder computation. Original EAP-IG remains scoped to GPT-2; this
+adapter does not supply an audited transformer-edge graph.
 
 ## Validation
 
-Validated with a tiny randomly initialized instance of this native architecture, including real image pixels, the vision tower, projector, and decoder. The named pretrained checkpoint is a loading example; its weights were not run in this release.
+Validated with a tiny randomly initialized instance including the real vision
+path, and with the named pretrained checkpoint on eight fixed GQA/MMVP/VSR/
+VisOnlyQA report cases. Readouts, attention attribution, real residual edits
+and one complete paired-image path sweep are recorded in the
+[technical report](https://github.com/gexinh/vlm-probing/releases/latest/download/vlm-probing-technical-report.pdf).
 
-See [test coverage and results](../releases/v0.3.0.md), the
-[executable matrix](../../examples/hf_model_matrix.py), and the
+See the [architecture checks](../../examples/hf_model_matrix.py) and the
 [official model implementation](https://github.com/huggingface/transformers/blob/v5.3.0/src/transformers/models/qwen3_vl/modeling_qwen3_vl.py).
 
 Next: [method guides](../methods/README.md) and [metrics/calibration](../API.md).

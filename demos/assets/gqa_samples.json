@@ -1,0 +1,50 @@
+[
+  {
+    "id": "07302654",
+    "question_id": "07302654",
+    "image_id": "2341576",
+    "image_path": "2341576.jpg",
+    "question": "Is the shirt black or yellow?",
+    "answer": "yellow",
+    "other_answer": "black",
+    "bbox_xywh": [
+      264,
+      33,
+      57,
+      89
+    ],
+    "object_id": "3403056",
+    "object_name": "shirt",
+    "image_size": [
+      500,
+      333
+    ],
+    "image_sha256": "f2f5880022dce631fd23240b2d690a56dd1fa551205c48b16db210b147d2f968",
+    "source": "https://github.com/FightingFighting/cross-modal-information-flow-in-MLLM/blob/main/datasets/GQA_val_correct_question_with_choose_ChooseAttr.csv",
+    "original_image_archive": "https://downloads.cs.stanford.edu/nlp/data/gqa/images.zip"
+  },
+  {
+    "id": "19225230",
+    "question_id": "19225230",
+    "image_id": "2342134",
+    "image_path": "2342134.jpg",
+    "question": "Is the shirt black or yellow?",
+    "answer": "black",
+    "other_answer": "yellow",
+    "bbox_xywh": [
+      76,
+      147,
+      124,
+      134
+    ],
+    "object_id": "936886",
+    "object_name": "shirt",
+    "image_size": [
+      500,
+      375
+    ],
+    "image_sha256": "cff15093668bfc3d3c24c2f392176033f1f855d7b4bb37e35bf83adca169d5e4",
+    "source": "https://github.com/FightingFighting/cross-modal-information-flow-in-MLLM/blob/main/datasets/GQA_val_correct_question_with_choose_ChooseAttr.csv",
+    "original_image_archive": "https://downloads.cs.stanford.edu/nlp/data/gqa/images.zip"
+  }
+]

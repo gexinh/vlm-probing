@@ -31,11 +31,20 @@ class HuggingFaceTests(unittest.TestCase):
         raw = probe.adapter.run({**inputs, "use_cache": False}, capture=[site]).activations[site]
         projected = probe._heads(0, raw)
         torch.testing.assert_close(projected.sum(-2), model.model.layers[0].self_attn.o_proj(raw))
-        self.assertFalse(probe.describe()["methods"]["attention.reweight"]["available"])
-        with self.assertRaises(CapabilityError):
-            probe.attention.reweight(layers=[0])
-        with self.assertRaises(CapabilityError):
-            probe.causal.knockout(layers=[0])
+        if probe.spec.editable_attention:
+            result = probe.attention.reweight(layers=[0], queries="last_prompt", keys="all", weight=1.).run(
+                inputs, metric=TokenMargin(4, 5))
+            torch.testing.assert_close(result.tensors["effect"], torch.zeros(1, 2))
+        else:
+            with self.assertRaises(CapabilityError):
+                probe.attention.reweight(layers=[0])
+        if probe.spec.attention_scores:
+            result = probe.causal.knockout(layers=[0], queries="last_prompt", keys="last_prompt", joint=True).run(
+                inputs, metric=TokenMargin(4, 5))
+            self.assertTrue(torch.isfinite(result.tensors["effect"]).all())
+        else:  # Legacy Transformers 4.57 does not install the audited score tap.
+            with self.assertRaises(CapabilityError):
+                probe.causal.knockout(layers=[0])
 
     def test_qwen_actual_image_path_unequal_grids_and_six_lenses(self):
         model, inputs = make_qwen()

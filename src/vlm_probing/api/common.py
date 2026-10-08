@@ -73,7 +73,9 @@ def evaluate(metric, logits, layout):
     if metric is None:
         raise ValueError("provide a metric, e.g. TokenMargin(positive=..., negative=...)")
     score = metric.score(logits, layout) if hasattr(metric, "score") else metric(logits)
-    if not isinstance(score, torch.Tensor) or score.ndim > 1 or not torch.isfinite(score).all():
+    if (not isinstance(score, torch.Tensor) or score.ndim > 1
+            or (score.ndim == 1 and score.shape != (logits.shape[0],))
+            or not torch.isfinite(score).all()):
         raise ValueError("metric must return a finite scalar or [batch] tensor")
     return score
 

@@ -1,0 +1,32 @@
+{
+  "tuned": {
+    "directory": "artifacts/tuned",
+    "layers": [3, 7, 10],
+    "binding": {
+      "model_id": "COPY_FROM_YOUR_FITTING_MANIFEST",
+      "tokenizer_id": "COPY_FROM_YOUR_FITTING_MANIFEST",
+      "readout_id": "COPY_FROM_YOUR_FITTING_MANIFEST",
+      "calibration_id": "COPY_FROM_YOUR_FITTING_MANIFEST"
+    }
+  },
+  "jacobian": {
+    "directory": "artifacts/jacobian",
+    "layers": [3, 7, 10],
+    "binding": {
+      "model_id": "COPY_FROM_YOUR_FITTING_MANIFEST",
+      "tokenizer_id": "COPY_FROM_YOUR_FITTING_MANIFEST",
+      "readout_id": "COPY_FROM_YOUR_FITTING_MANIFEST",
+      "calibration_id": "COPY_FROM_YOUR_FITTING_MANIFEST"
+    }
+  },
+  "attention": {
+    "directory": "artifacts/attention",
+    "layers": [7, 10],
+    "binding": {
+      "model_id": "COPY_FROM_YOUR_FITTING_MANIFEST",
+      "tokenizer_id": "COPY_FROM_YOUR_FITTING_MANIFEST",
+      "readout_id": "COPY_FROM_YOUR_FITTING_MANIFEST",
+      "calibration_id": "COPY_FROM_YOUR_FITTING_MANIFEST"
+    }
+  }
+}

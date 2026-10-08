@@ -18,16 +18,22 @@ from .spec import ModelSpec
 
 @dataclass(frozen=True)
 class HookPoint:
-    """selector: output tuple index/dict key; input positional index/kwarg name."""
+    """Container selector, followed by an optional disjoint last-axis slice."""
     module: str
     kind: Literal["input", "output"] = "output"
     selector: int | str | None = None
+    tensor_slice: tuple[int, int] | None = None
 
     def __post_init__(self) -> None:
         if self.kind not in {"input", "output"}:
             raise ValueError("kind must be input or output")
         if self.kind == "input" and self.selector is None:
             raise ValueError("Input hooks require a positional index or keyword selector")
+        if self.tensor_slice is not None:
+            if (not isinstance(self.tensor_slice, tuple) or len(self.tensor_slice) != 2
+                    or any(type(i) is not int for i in self.tensor_slice)
+                    or not 0 <= self.tensor_slice[0] < self.tensor_slice[1]):
+                raise ValueError("tensor_slice must be a (start, stop) pair with 0 <= start < stop")
 
 
 class ModelReadout:
@@ -71,6 +77,15 @@ class TorchModelAdapter(BaseModelAdapter):
             raise ValueError("Duplicate aliases for the same hook site are ambiguous")
         for spec in self.sites.values():
             model.get_submodule(spec.module)  # Fail before any model execution.
+        # Disjoint packed Q/K/V slices are legal; overlapping aliases are not.
+        points = list(self.sites.values())
+        for i, left in enumerate(points):
+            for right in points[i + 1:]:
+                if (left.module, left.kind, left.selector) != (right.module, right.kind, right.selector):
+                    continue
+                a, b = left.tensor_slice, right.tensor_slice
+                if a is None or b is None or max(a[0], b[0]) < min(a[1], b[1]):
+                    raise ValueError("Overlapping aliases for the same hook tensor are ambiguous")
 
     @staticmethod
     def _extract(value: Any, selector: int | str | None) -> Tensor:
@@ -133,7 +148,7 @@ class TorchModelAdapter(BaseModelAdapter):
 
         def output_hook(name: str, spec: HookPoint):
             def hook(module, args, kwargs, output):
-                edited = transform(name, self._extract(output, spec.selector))
+                edited = edit_tensor(name, spec, self._extract(output, spec.selector))
                 return self._replace(output, spec.selector, edited)
             return hook
 
@@ -141,10 +156,21 @@ class TorchModelAdapter(BaseModelAdapter):
             def hook(module, args, kwargs):
                 keyword = isinstance(spec.selector, str)
                 value = kwargs if keyword else args
-                edited = transform(name, self._extract(value, spec.selector))
+                edited = edit_tensor(name, spec, self._extract(value, spec.selector))
                 replaced = self._replace(value, spec.selector, edited)
                 return (args, replaced) if keyword else (replaced, kwargs)
             return hook
+
+        def edit_tensor(name: str, spec: HookPoint, value: Tensor) -> Tensor:
+            if spec.tensor_slice is None:
+                return transform(name, value)
+            start, stop = spec.tensor_slice
+            if value.ndim < 1 or stop > value.shape[-1]:
+                raise ValueError(f"tensor_slice at {name!r} exceeds the hook tensor width")
+            edited = transform(name, value[..., start:stop])
+            result = value.clone()
+            result[..., start:stop] = edited
+            return result
 
         try:
             self.model.eval()

@@ -53,9 +53,10 @@ class TinyModel(nn.Module):
 
     def probing_adapter(self):
         """An explicit model protocol: Prober(model) uses this verified contract."""
-        from vlm_probing import HookPoint, ModelReadout, ModelSpec, TokenLayout, TorchModelAdapter
+        from vlm_probing import HeadSite, HookPoint, ModelReadout, ModelSpec, TokenLayout, TorchModelAdapter
 
         sites, residuals, attentions, scores, heads = {}, {}, {}, {}, {}
+        path_heads, path_qkv = {}, {}
         for i in range(len(self.layers)):
             residuals[i], attentions[i] = f"residual.{i}", f"attention.{i}"
             scores[i], heads[i] = f"scores.{i}", f"heads.{i}"
@@ -63,6 +64,12 @@ class TinyModel(nn.Module):
             sites[attentions[i]] = HookPoint(f"layers.{i}.attention.probs")
             sites[scores[i]] = HookPoint(f"layers.{i}.attention.scores")
             sites[heads[i]] = HookPoint(f"layers.{i}.attention.output")
+            path_heads[i] = HeadSite(heads[i], 1, self.norm.normalized_shape[0])
+            path_qkv[i] = {}
+            for kind, component in (("q", "query"), ("k", "key"), ("v", "value")):
+                site = f"{kind}.{i}"
+                sites[site] = HookPoint(f"layers.{i}.attention.{component}")
+                path_qkv[i][kind] = HeadSite(site, 1, self.norm.normalized_shape[0])
         sites["embeddings"] = HookPoint("layers.0", kind="input", selector=0)
         sites["last_mlp"] = HookPoint(f"layers.{len(self.layers)-1}.mlp")
 
@@ -84,6 +91,7 @@ class TinyModel(nn.Module):
             embeddings="embeddings", input_embeddings=self.embedding.weight,
             layout=layout, project_heads=lambda _, value: value.unsqueeze(-2),
             linear_readout=linear_readout, editable_attention=set(attentions),
+            path_heads=path_heads, path_qkv=path_qkv, path_final=residuals[len(self.layers)-1],
             edges={"last_attention_to_residual": heads[len(self.layers)-1],
                    "last_mlp_to_residual": "last_mlp"},
             notes=("Random CPU demonstration model; image embeddings are supplied directly.",),

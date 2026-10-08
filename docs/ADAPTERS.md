@@ -61,6 +61,9 @@ does not claim attention or head access. The full demonstration contract is in
   An integer/string selector selects a tuple item/dictionary value.
 - `kind="input"` needs a selector: an integer positional argument index or a
   keyword name. Confirm which calling convention the real model uses.
+- `tensor_slice=(start, stop)` selects a last-dimension interval after the
+  container selector. Disjoint slices support GPT-2's packed Q/K/V projection;
+  overlapping aliases are rejected, and edits preserve the remaining slices.
 - Each requested site must execute exactly once per forward. Repeated/shared
   sites and missing sites raise errors. Hooks are removed on success and failure.
 - An intervention must preserve shape, dtype, and device. It must replace the
@@ -93,22 +96,45 @@ does not claim attention or head access. The full demonstration contract is in
 | `input_embeddings` | Input embedding table `[vocabulary, residual_dimension]` |
 | `linear_readout(full_residual)` | Return `(weight[V,D], inverse_norm_scale[B,T,1], center_bool)` |
 | `edges` | `{edge_name: site}` for independently replaceable actual graph messages |
+| `path_heads` | `{layer: HeadSite(site, heads, head_dim)}`; editable outputs at every decoder layer, `[B,T,H*D]` or `[B,T,H,D]` |
+| `path_qkv` | `{layer: {"q"/"k"/"v": HeadSite(...)}}`; editable receiver inputs, distinct from output freeze sites |
+| `path_final` | Final residual site before the readout normalization |
 | `alignment_keys` | Model-kwargs tensor keys compared before paired interventions |
 | `forward_defaults` | Explicit default model kwargs merged before public execution |
+| `output_kind` | `"language"` for `[B,T,V]`, `"classification"` for `[B,C]` with a separate patch layout |
+| `attention_inputs / attention_values` | Pre-LN residual and actual V sites for Beyond Intuition token weighting |
+| `project_values(layer, tensor)` | Concatenate/replicate V heads then apply output weights without output bias; this is not an `A @ V` head contribution |
 
 Head projection must split the *query-head* axis correctly, including GQA. Exclude
 output-projection biases from individual head contributions. Fixed-scale logit
 attribution uses the full residual's denominator; fold norm gain into the readout
 weight and handle biases separately. LayerNorm needs centering; RMSNorm does not.
 
-A returned attention diagnostic is not necessarily editable. The native HF
-adapters expose eager attention observations but do not mark them editable. No
-fused kernels or global Transformers classes are monkey-patched.
+A returned attention diagnostic is not necessarily editable. Audited native
+Transformers 5.3 eager Llama, Mistral, Qwen2, Qwen2-VL, Qwen2.5-VL, Qwen3-VL,
+Qwen3.5 full-attention blocks, and ViT classifiers expose masked logits and the
+probabilities actually consumed by `A @ V` through parameterless taps.
+Their per-instance attention calls use an audited eager interface; the backend
+is restored before decoder mask construction and after exceptions. Global
+Transformers classes and model weights are unchanged. Unrecognized attention
+classes require explicit score sites. See [native score taps](../src/vlm_probing/adapters/hf_attention.py).
 
 For EAP-IG, every edge must be an independently replaceable message at a consumer.
 A list of residual nodes does not establish an edge-level circuit. Joint replay
 must actually use all supplied messages; identical aliases are rejected by the
-hook adapter. The current public implementation stacks equally shaped edge tensors.
+hook adapter. The activation-space implementation stacks equally shaped edge
+tensors. The original input-path algorithm uses `graph="transformer"`, with a
+scoped native GPT-2 provider that splits Q/K/V residual inputs independently,
+retains the native computation, and actually replaces excluded edge messages.
+
+IOI path patching requires `path_heads` to cover all decoder layers. Partial
+coverage cannot preserve its freeze rule. Pre-output-projection messages are
+valid output controls when the projection is fixed and linear; the projection
+and shared bias recompute normally. Receiver Q/K/V is cached upstream of this
+freeze site. In GQA, Q uses query-head counts and K/V use physical KV-head counts.
+Q/K hooks precede positional rotation; Qwen3-VL's hooks follow its per-head
+normalization. For custom adapters, declare the tensor actually consumed by
+attention, and preserve that hook-stage convention in experimental metadata.
 
 ## Registering an architecture
 
@@ -124,7 +150,8 @@ assumed compatible. Alternatively implement `model.probing_adapter()` returning
 a configured adapter. Registration takes precedence over that protocol and the
 built-in HF adapters. `replace=True` explicitly replaces an existing registration.
 
-Built-in HF adapters use explicit contracts for seven VLM families and Llama.
+Built-in HF adapters use explicit contracts for eight VLM families, Llama, GPT-2,
+and the native ViT classifier.
 See the [model matrix](models/README.md) for classes, versions, examples, and
 validation. Qwen3.5 linear-attention blocks have residual sites but no standard
 softmax attention/head sites. Qwen3-VL captures residuals after DeepStack visual

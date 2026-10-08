@@ -1,0 +1,17 @@
+{
+  "source_url": "https://github.com/hannamw/eap-ig-faithfulness/blob/d42fea6aa2c7acca39007c9c94923770669cb9ae/data/ioi/gpt2.csv",
+  "source_revision": "d42fea6aa2c7acca39007c9c94923770669cb9ae",
+  "source_csv_sha256": "a3de03844889e044569d90022f86f8af863319a28547d2f89ff11b9b6b33ea9b",
+  "source_total_rows": 1000,
+  "selection": "first two rows in published CSV; no model-performance selection",
+  "donor_rule": "author corrupted column: replace second subject occurrence with random third name",
+  "source_row_ids": [
+    "826",
+    "475"
+  ],
+  "model_repository": "openai-community/gpt2",
+  "model_revision": "607a30d783dfa663caf39e06633721c8d4cfcd7e",
+  "upstream_method_revision": "e24bafd3d22af2c59ac5a83e0a6581b89b5c05dd",
+  "modality": "text-only",
+  "prepend_bos": true
+}

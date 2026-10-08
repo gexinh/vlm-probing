@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "title": "Two author-published VRUBench examples from the paper",
+  "source_kind": "author_published_paper_examples",
+  "official_dataset_release": false,
+  "record_count": 2,
+  "paper": {
+    "arxiv_id": "2604.15294v1",
+    "title": "How Do LLMs and VLMs Understand Viewpoint Rotation Without Vision? An Interpretability Study",
+    "authors": [
+      "Zhen Yang",
+      "Ping Jian",
+      "Zhongbin Guo",
+      "Zuming Zhang",
+      "Chengzhi Li",
+      "Yonghong Deng",
+      "Xinyue Zhang",
+      "Wenpeng Lu"
+    ],
+    "url": "https://arxiv.org/abs/2604.15294v1",
+    "pdf": "https://arxiv.org/pdf/2604.15294v1",
+    "license": "CC-BY-4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  "record_sources": {
+    "vrubench-paper-appendix-a-2step": {
+      "pdf_page": 14,
+      "location": "Appendix A, 2-step rotation",
+      "clean_answer": "unknown",
+      "donor_answer": "avocado",
+      "donor_published": false
+    },
+    "vrubench-paper-figure-7c-4step": {
+      "pdf_page": 17,
+      "location": "Appendix D, Figure 7(c)",
+      "clean_answer": "wallet",
+      "donor_answer": "window",
+      "donor_published": true
+    }
+  },
+  "preparation": {
+    "task_instruction": "Verbatim from Appendix A, with PDF line wrapping removed.",
+    "system_prompt": "You are a helpful assistant",
+    "prompt_layout": "Task instruction, blank line, then original Action/Observation history. Blank final Observation:; labels never appended.",
+    "pair_construction": "Flip only the final left/right direction while keeping the angle and all previous history unchanged.",
+    "labels": "Published clean labels and the published Figure 7(c) donor label are independently verified by rotation arithmetic. The Appendix A donor label is derived using the paper corruption rule.",
+    "sample_selection": "Two published examples with distinct clean/donor answers, selected for provenance rather than head effects or model performance.",
+    "scope": "These are attributed paper examples. They are not a download of the complete 19,591-instance VRUBench release and cannot reproduce the dataset-average Figure 2(d)."
+  },
+  "release_verification": {
+    "checked_at_utc": "2026-10-05T22:44:34.347865+00:00",
+    "official_github": "https://github.com/Young-Zhen/VRU_Interpret",
+    "github_api_repository": "https://api.github.com/repos/Young-Zhen/VRU_Interpret",
+    "github_repository_size": 0,
+    "github_contents_status": 404,
+    "github_contents_message": "This repository is empty.",
+    "github_branches": [],
+    "github_releases": [],
+    "hf_search": "https://huggingface.co/api/datasets?search=VRUBench&limit=100",
+    "hf_vrubench_search_results": [],
+    "hf_other_queries": [
+      "VRU",
+      "viewpoint rotation",
+      "Young-Zhen"
+    ],
+    "hf_unrelated_candidate": "SaiPavankumar22/vru-repro-code contains privacy/excess-risk experiments, not viewpoint rotation understanding or VRUBench.",
+    "local_model_dataset_list": "paper/model_dataset_list.pdf contains no VRUBench entry.",
+    "conclusion": "No author released full VRUBench download located by these checks; the authors announced release at the currently empty repository."
+  },
+  "jsonl_sha256": "28bdb5a0be04da590537bcfc5f1b9d3413682a99172a5c477b592cef90d72ffe"
+}

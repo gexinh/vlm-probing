@@ -57,13 +57,18 @@ class TokenLayout:
                 if self.visual is None:
                     raise CapabilityError("visual/text selection requires an explicit visual token layout")
                 result = self.visual if tokens == "visual" else valid & ~self.visual
-            elif tokens == "last_prompt":
+            elif tokens in {"last_prompt", "prediction"}:
                 prompt = valid if self.prompt is None else self.prompt
                 if not prompt.any(-1).all():
                     raise ValueError("each example needs a prompt token")
                 index = torch.arange(valid.shape[1], device=valid.device).expand_as(valid)
                 last = index.masked_fill(~prompt, -1).max(-1).values
                 result = torch.zeros_like(valid).scatter_(1, last[:, None], True)
+                if tokens == "prediction":
+                    # At generation step t the model predicts from the context's
+                    # last token and subsequent generated positions. Replaying
+                    # these positions preserves prior causal steering history.
+                    result = result | (valid & ~prompt)
             else:
                 raise ValueError(f"unknown token selector {tokens!r}")
         elif isinstance(tokens, Tensor) and tokens.dtype == torch.bool:
@@ -91,6 +96,33 @@ class ProbeInputs:
     layout: TokenLayout | None = None
 
 
+@dataclass(frozen=True)
+class HeadSite:
+    """An editable head axis, flattened [B,T,H*D] or explicit [B,T,H,D].
+
+    Counts describe the physical tensor: Q uses query heads; K/V use KV heads
+    in grouped-query attention. No projection or dimension inference is applied.
+    """
+
+    site: str
+    heads: int
+    head_dim: int
+
+    def __post_init__(self):
+        if not isinstance(self.site, str) or not self.site:
+            raise ValueError("HeadSite.site must be a nonempty hook name")
+        if any(type(n) is not int or n < 1 for n in (self.heads, self.head_dim)):
+            raise ValueError("HeadSite heads and head_dim must be positive integers")
+
+    def view(self, value: Tensor) -> Tensor:
+        if value.ndim == 3 and value.shape[-1] == self.heads * self.head_dim:
+            return value.reshape(*value.shape[:2], self.heads, self.head_dim)
+        if value.ndim == 4 and value.shape[-2:] == (self.heads, self.head_dim):
+            return value
+        raise ValueError(f"{self.site!r} must be [B,T,{self.heads * self.head_dim}] "
+                         f"or [B,T,{self.heads},{self.head_dim}], got {tuple(value.shape)}")
+
+
 @dataclass
 class ModelSpec:
     """Site names reference an adapter's hook table; no shape-based inference.
@@ -116,19 +148,51 @@ class ModelSpec:
     alignment_keys: tuple[str, ...] = ()
     forward_defaults: dict[str, Any] = field(default_factory=dict)
     notes: tuple[str, ...] = ()
+    # Explicit IOI path controls. Output sites must cover every decoder layer.
+    path_heads: dict[int, HeadSite] = field(default_factory=dict)
+    path_qkv: dict[int, dict[str, HeadSite]] = field(default_factory=dict)
+    path_final: str | None = None
+    # Classifier logits have no sequence axis; token masks still describe patches.
+    output_kind: str = "language"
+    # Beyond Intuition's token weights need pre-LN inputs and projected V, not A@V.
+    attention_inputs: dict[int, str] = field(default_factory=dict)
+    attention_values: dict[int, str] = field(default_factory=dict)
+    project_values: Callable[[int, Tensor], Tensor] | None = None
 
     def validate(self, sites):
         if not self.residuals or any(type(k) is not int or k < 0 for k in self.residuals):
             raise ValueError("spec.residuals requires nonnegative layer indices")
-        mappings = (self.residuals, self.attentions, self.attention_scores, self.heads, self.edges)
+        if self.output_kind not in {"language", "classification"}:
+            raise ValueError("output_kind must be language or classification")
+        mappings = (self.residuals, self.attentions, self.attention_scores, self.heads, self.edges,
+                    self.attention_inputs, self.attention_values)
         names = {name for mapping in mappings for name in mapping.values()}
         if self.embeddings is not None:
             names.add(self.embeddings)
+        for mapping in (self.path_heads, *self.path_qkv.values()):
+            if any(not isinstance(value, HeadSite) for value in mapping.values()):
+                raise TypeError("path hook declarations must use HeadSite")
+            names.update(value.site for value in mapping.values())
+        if self.path_final is not None:
+            names.add(self.path_final)
         missing = names - set(sites)
         if missing:
             raise ValueError(f"spec references unknown hook sites: {sorted(missing)}")
         if not self.editable_attention <= self.attentions.keys():
             raise ValueError("editable attention layers must declare probability sites")
-        for mapping in (self.attentions, self.attention_scores, self.heads):
+        for mapping in (self.attentions, self.attention_scores, self.heads,
+                        self.attention_inputs, self.attention_values):
             if not mapping.keys() <= self.residuals.keys():
                 raise ValueError("attention/head layer indices must exist in residuals")
+        for mapping in (self.path_heads, self.path_qkv):
+            if not mapping.keys() <= self.residuals.keys():
+                raise ValueError("path layer indices must exist in residuals")
+        if any(set(mapping) - {"q", "k", "v"} for mapping in self.path_qkv.values()):
+            raise ValueError("path_qkv kinds must be q, k, or v")
+        path_outputs = [value.site for value in self.path_heads.values()]
+        path_inputs = [value.site for mapping in self.path_qkv.values() for value in mapping.values()]
+        path_sites = [*path_outputs, *path_inputs]
+        if self.path_final is not None:
+            path_sites.append(self.path_final)
+        if len(path_sites) != len(set(path_sites)):
+            raise ValueError("path output, Q/K/V, and final residual sites must be distinct")

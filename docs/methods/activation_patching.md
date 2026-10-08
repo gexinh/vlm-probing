@@ -38,8 +38,8 @@ Returns a `ProbeResult`: `baseline_score`, `intervention_score`, and `effect = i
 
 ## Support and scope
 
-All residual layers in all seven VLM adapters. Source and receiver use the same expanded coordinates; arbitrary position remapping is not implemented. Alignment does not by itself establish semantic equivalence between image regions.
+Supported language-model residual layers and all eight VLM families. Source and receiver use the same expanded coordinates; arbitrary position remapping is not implemented. Alignment does not by itself establish semantic equivalence between image regions.
 
-[Paper / source reference](../REFERENCES.md#activation-patching) ·
+[Paper / source reference](../REFERENCES.md#causal-methods) ·
 [Tensor implementation](../../src/vlm_probing/causal/activation_patching.py) ·
 [Shared result conventions](README.md#shared-conventions)

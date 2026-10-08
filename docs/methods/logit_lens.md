@@ -35,8 +35,9 @@ Returns a `ProbeResult`: `logits[L,N,V]` and `positions[N,2]`. `N` packs selecte
 
 ## Support and scope
 
-Available on all seven VLM adapters, including every Qwen3.5 residual layer. Readout is observational; a decoded token is not evidence of causal influence.
+Available on supported language-model residual sites and all eight VLM families,
+including every Qwen3.5 residual layer. Readout is observational; a decoded token is not evidence of causal influence.
 
-[Paper / source reference](../REFERENCES.md#logit-lens) ·
+[Paper / source reference](../REFERENCES.md#lens-methods) ·
 [Tensor implementation](../../src/vlm_probing/lenses/logit.py) ·
 [Shared result conventions](README.md#shared-conventions)

@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "measurement_policy": "Actual completed model measurements only; archive JSON strings containing machine-local paths are redacted for portability. Numerical arrays, tokens, settings and provenance hashes are retained.",
+  "files": [
+    {
+      "path": "snapshots/attention_knockout/07302654.json",
+      "kind": "actual_measurements",
+      "original_sha256": "dd885a70e3e087b73949398aaffa05254da0756f6ae5b39a641d1756705325c3",
+      "sha256": "d106c6e0e303e16be834538ead661340042f0f9efe0e47fed9c014ea1979b71d"
+    },
+    {
+      "path": "snapshots/vlm_lens/07302654.json",
+      "kind": "actual_measurements",
+      "original_sha256": "00b2126e0807df82ef6c6390ecfdeb91a025e865e689c74826172da02b30aabf",
+      "sha256": "3a8b88411ffa04bde11badce476e2fcf007d029e935e5a8b576210fd48c28f3d"
+    },
+    {
+      "path": "snapshots/vlm_attention_comparison/07302654.json",
+      "kind": "actual_measurements",
+      "original_sha256": "31365b5cfd2c5aad751ead9e133a7c207c98a05ba4ee22142c88f31f97f8d3c4",
+      "sha256": "f8c939db0ebf58e5c8bb23676cddf6f09efe14d1c0e38b894bbb77d77a170aa1"
+    },
+    {
+      "path": "snapshots/attention_knockout/19225230.json",
+      "kind": "actual_measurements",
+      "original_sha256": "88a2243438bf169fc03de0d579f2505fac8e43cd84d68abdfafc9c6e1dabc566",
+      "sha256": "b082a0244c112b1b47b539d3af03cbb976faf433861f852143d1e340e4c7dd02"
+    },
+    {
+      "path": "snapshots/vlm_lens/19225230.json",
+      "kind": "actual_measurements",
+      "original_sha256": "930efbf94f9aa59136172a30b237887c6cc1081f66b106849377ed1435a0c95b",
+      "sha256": "62c26eb9fc46b14c493ee0c2cde643ebd1f7659a1afa08cd882fb2ec547174bf"
+    },
+    {
+      "path": "snapshots/vlm_attention_comparison/19225230.json",
+      "kind": "actual_measurements",
+      "original_sha256": "55c05a43788ff3c24640e73501eaa573502647e9c988101e7ff540be7f16aaf5",
+      "sha256": "0d99c4b4be0dc1cf75dfc166b5f2b3c8d2d1200f4e825ecac3faa2c30d11e85b"
+    },
+    {
+      "path": "snapshots/steering_vsv/310196.json",
+      "kind": "actual_measurements",
+      "original_sha256": "08527ac3ae30ce63f4855ffd547b36171a7a406f7b5a8691e3b72afbb3b4423e",
+      "sha256": "56ef9e1cb314b77637099a1a57d46f160c78dd58327cb5cac73fae0898dbbf59"
+    },
+    {
+      "path": "snapshots/steering_vsv/210789.json",
+      "kind": "actual_measurements",
+      "original_sha256": "4c4c7e819b44461ce2b365403e23b5ed5aaa29072db4db3e3af04020f8c5560d",
+      "sha256": "9f208cded314695484b969a498b967f4d838c7f96f9b0245e3f69873a17d7a42"
+    },
+    {
+      "path": "snapshots/steering_vsv/caption_reviews.json",
+      "kind": "actual_measurements",
+      "original_sha256": "4e8924f7daf5e59b88caa8c1ee6658417978a7962f0d70749838dfaf146a6667",
+      "sha256": "3a5aec7fd81c3c152abd65e260bf28c7feb4789712eff9ef6b95b5e83801f2c6"
+    },
+    {
+      "path": "snapshots/eap_ig/gpt2_ioi.json",
+      "kind": "actual_measurements",
+      "original_sha256": "ed4ff93e4280a4abc592f905f96e560b5aa3e37beb12fb8e016fab1123334471",
+      "sha256": "91d43a1e5c95ffb3d5820e193fa64d9774f3f1957bfdeb2f0f1fcee0de326494"
+    },
+    {
+      "path": "snapshots/lens_comparison/text-readouts.json",
+      "kind": "actual_measurements",
+      "original_sha256": "c1dd9e6cfc32fc5a7f01f4b21c5983aeb8c1764804164f49bc847fc494b3c8c6",
+      "sha256": "572f2076b929634e58f49332233ff1a57548d8ec269132da90a0824300520f99"
+    },
+    {
+      "path": "snapshots/activation_patching/smolvlm.json",
+      "kind": "actual_measurements",
+      "original_sha256": "736e38a65f8359fcc2ef289e1b8e7256219485698d7d406ff3c82ea4d22477e9",
+      "sha256": "9e5d11193335e865ef2ba3d1eb5c69a40943ef74d45e40b7bac7b6e1a3f4bbf4"
+    },
+    {
+      "path": "snapshots/activation_patching/llava.json",
+      "kind": "actual_measurements",
+      "original_sha256": "a58f82206f2593b1f3fbcb9de0384e2e98a2d793e72629864f92d94654b44f21",
+      "sha256": "0fca5d6c592a45bde053c4d49a3c6e01b126244df4b586041b998dceb42f0ffd"
+    },
+    {
+      "path": "snapshots/path_patching/qwen2_5_vl_3b.json",
+      "kind": "actual_measurements",
+      "original_sha256": "124a385d73d2c8f23fd8a1151cb42409be849b840c626d8c96767baaba290ef1",
+      "sha256": "b5da594020b95c9bbd00fd003e572ab3c74ab18d60e707e4130758c56502bc3d"
+    },
+    {
+      "path": "snapshots/path_patching/qwen2_5_vl_3b.receiver_paths.json",
+      "kind": "actual_measurements",
+      "original_sha256": "31a41eb47549e4e2dfb1a1cd1f8f7b3375f10678fb01d228c6137e5caf19d464",
+      "sha256": "e4f28b30b4b7f0914e621c945ee841eb035aca5bba3c2ffda5a26bfe30644cf2"
+    },
+    {
+      "path": "snapshots/path_patching/qwen2_5_vl_3b.prompts.json",
+      "kind": "actual_measurements",
+      "original_sha256": "e61819098c8f848f0a8a350a04badc7a52df4a7632a0088a2194be83a31d7987",
+      "sha256": "494a632c34b61044d87f366d009a25b138e0ae3f37f34b887b1e7bbc05d24f4d"
+    },
+    {
+      "path": "snapshots/path_patching/qwen2_5_vl_7b.json",
+      "kind": "actual_measurements",
+      "original_sha256": "e8d528b5c6542bc08b83837456053bae390d0829febfb0925c69a3e73a159306",
+      "sha256": "d24f82e4876ee0b61b9816740f1adc3ed5f10978b9665c606a3e4fb6aeecec38"
+    },
+    {
+      "path": "snapshots/path_patching/qwen2_5_vl_7b.receiver_paths.json",
+      "kind": "actual_measurements",
+      "original_sha256": "8907749499e229db4e8703f89137c71cf474921b1112fec013721b9eb40205d7",
+      "sha256": "f79b861203f161e278aeef7044e2a69f1e305e654a2ebd311eedcbbd92604dda"
+    },
+    {
+      "path": "snapshots/path_patching/qwen2_5_vl_7b.prompts.json",
+      "kind": "actual_measurements",
+      "original_sha256": "2d97f48b4e7363e667402d6c3cc91735f1e7874ad8ebd3559fe247f8a5bdf8f8",
+      "sha256": "21b9a404355f6c3e52c15a0f2e80776a771faacfa4ddd1d177b69ba04c26bb8e"
+    },
+    {
+      "path": "assets/images/2341576.jpg",
+      "kind": "third_party_sample_image",
+      "sha256": "f2f5880022dce631fd23240b2d690a56dd1fa551205c48b16db210b147d2f968"
+    },
+    {
+      "path": "assets/images/2342134.jpg",
+      "kind": "third_party_sample_image",
+      "sha256": "cff15093668bfc3d3c24c2f392176033f1f855d7b4bb37e35bf83adca169d5e4"
+    },
+    {
+      "path": "assets/images/COCO_val2014_000000310196.jpg",
+      "kind": "third_party_sample_image",
+      "sha256": "0dcc39d91764e59e0e01c11b92ec31320f094a87ca2dce5e0c56c4f1a361daf4"
+    },
+    {
+      "path": "assets/images/COCO_val2014_000000210789.jpg",
+      "kind": "third_party_sample_image",
+      "sha256": "86d17cae625d00c9e8dfd08f5bf04e1fd66120bd6cde931ebd1e0ef6962affc7"
+    },
+    {
+      "path": "assets/images/catdog.image_png_base64.png",
+      "kind": "third_party_processed_sample_image",
+      "sha256": "3147ef777145d725a2e368fe98ce7bb0022d20b0c638634722dc30ccf37ec062"
+    },
+    {
+      "path": "assets/images/catdog.crop_png_base64.png",
+      "kind": "third_party_processed_sample_image",
+      "sha256": "c8a5d5ae877b748b3668ed456ae0acb92c5d688430f77f444a339aa0fca5bb18"
+    },
+    {
+      "path": "snapshots/attention_comparison/catdog.json",
+      "kind": "actual_measurements",
+      "original_sha256": "8ef00c8d25e4ef1894ada586a0f946f62a79f473a61b02298f619df50164c9d3",
+      "sha256": "d2e3ff8d8b5de44f78c6ae3bec06ffdf1f1d6f72b430eb4ffdeb5727ebe05fa6"
+    },
+    {
+      "path": "assets/images/el2.image_png_base64.png",
+      "kind": "third_party_processed_sample_image",
+      "sha256": "444ed4afdf7354b2f3893b65f18fe44606e2a5d2ca801dcf5040715496c95330"
+    },
+    {
+      "path": "assets/images/el2.crop_png_base64.png",
+      "kind": "third_party_processed_sample_image",
+      "sha256": "1ce96fcbf19d4cfdec60215949c33310cb4372f7b1899415fc7f19c32d39c44b"
+    },
+    {
+      "path": "snapshots/attention_comparison/el2.json",
+      "kind": "actual_measurements",
+      "original_sha256": "a08e2dd06f721a085e6ff9fb4cef0b8619f6d9f400f75ad1f9466c5a14be6670",
+      "sha256": "a1b4fafe3c72dbf96ef291ed725652704fed04f8b6baef4e1867729d6807ff64"
+    }
+  ]
+}

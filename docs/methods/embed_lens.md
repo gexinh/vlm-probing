@@ -38,8 +38,10 @@ Returns a `ProbeResult`: `token_ids[1,N,K]`, `similarities[1,N,K]`, `activation_
 
 ## Support and scope
 
-All seven VLM adapters. This implements semantic nearest-neighbor readout. Sink/dead/alive classification needs checkpoint-specific evidence; no universal token IDs or full paper pruning/clustering pipeline are assumed.
+Requires an embedding-space capture and the native input-embedding table.
+Supported VLMs provide projected visual tokens; language models can use
+explicit text/all-token selectors. This implements semantic nearest-neighbor readout. Sink/dead/alive classification needs checkpoint-specific evidence; no universal token IDs or full paper pruning/clustering pipeline are assumed.
 
-[Paper / source reference](../REFERENCES.md#embedlens) ·
+[Paper / source reference](../REFERENCES.md#lens-methods) ·
 [Tensor implementation](../../src/vlm_probing/lenses/embed.py) ·
 [Shared result conventions](README.md#shared-conventions)

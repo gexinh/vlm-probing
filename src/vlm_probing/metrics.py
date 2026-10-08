@@ -3,6 +3,22 @@ import torch
 from torch import Tensor
 
 
+class ClassScore:
+    """Per-example image-classification target; never invent tokenwise logits."""
+
+    def __init__(self, target: int, *, kind="logit"):
+        if type(target) is not int or target < 0:
+            raise ValueError("target must be a nonnegative class index")
+        if kind not in {"logit", "probability"}:
+            raise ValueError("kind must be logit or probability")
+        self.target, self.kind = target, kind
+
+    def score(self, logits, layout=None):
+        if logits.ndim != 2 or self.target >= logits.shape[-1]:
+            raise ValueError("ClassScore requires [batch,classes] logits and a valid target")
+        return (logits.float().softmax(-1) if self.kind == "probability" else logits)[:, self.target]
+
+
 class TokenMargin:
     """Per-example candidate logit difference at one selected prompt position."""
 

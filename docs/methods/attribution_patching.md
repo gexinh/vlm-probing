@@ -36,8 +36,8 @@ Returns a `ProbeResult`: `token_scores[L,B,T]` and batch-summed `estimated_effec
 
 ## Support and scope
 
-All residual layers in all seven VLM adapters. This first-order estimate can differ from the exact intervention, especially for large changes. Use exact patching to validate important sites.
+Supported language-model residual layers and all eight VLM families. This first-order estimate can differ from the exact intervention, especially for large changes. Use exact patching to validate important sites.
 
-[Paper / source reference](../REFERENCES.md#attribution-patching) ·
+[Paper / source reference](../REFERENCES.md#causal-methods) ·
 [Tensor implementation](../../src/vlm_probing/causal/attribution_patching.py) ·
 [Shared result conventions](README.md#shared-conventions)

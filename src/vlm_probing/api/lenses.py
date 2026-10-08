@@ -64,7 +64,8 @@ class FittedLensProbe(LensProbe):
                 "tokenizer_id": "unspecified", "calibration_id": "unspecified",
                 **self.binding, "site": mapping[layer]}
 
-    def _new_kernel(self, layer, width, device, dtype, heads=None):
+    def _new_kernel(self, layer, width, device, dtype, heads=None, *,
+                    initial_unembedding=None, initial_bias=None):
         binding = self._binding(layer)
         readout = self.probe.adapter.readout
         if self.name == "tuned":
@@ -73,7 +74,10 @@ class FittedLensProbe(LensProbe):
         if self.name == "jacobian":
             return kernels.JacobianLens(readout, binding=binding)
         vocab = self.probe.spec.input_embeddings.shape[0]
-        return kernels.AttentionLens(heads, width, vocab, binding=binding, device=device)
+        return kernels.AttentionLens(
+            heads, width, vocab, binding=binding, device=device,
+            initial_unembedding=initial_unembedding, initial_bias=initial_bias,
+        )
 
     def _kernel(self, layer, hidden):
         if layer not in self.kernels:
@@ -86,13 +90,29 @@ class FittedLensProbe(LensProbe):
         return super().run(inputs, **kwargs)
 
     @model_eval
-    def fit(self, inputs, **kwargs):
+    def fit(self, inputs, *, initial_unembedding=None, initial_bias=None, **kwargs):
+        """Fit the lens; optional head initialization is Attention Lens only.
+
+        ``initial_unembedding`` is [vocabulary, residual_width], e.g. the
+        native ``lm_head.weight``; ``initial_bias`` is [vocabulary]. They
+        initialize new head decoders before optimization and cannot reset an
+        already fitted/loaded kernel. The head decoder applies no final norm.
+        """
+        initialize = initial_unembedding is not None or initial_bias is not None
+        if initialize:
+            if self.name != "attention":
+                raise ValueError("head decoder initialization is only supported by Attention Lens")
+            if any(layer in self.kernels for layer in self.layers):
+                raise ValueError("initialization requires new Attention Lens kernels; create a new lens to reset")
         trace, layout, mask, values = self._capture(inputs)
         for layer, hidden in zip(self.layers, values):
             kernel = self.kernels.get(layer)
             if kernel is None:
-                kernel = self._new_kernel(layer, hidden.shape[-1], hidden.device, hidden.dtype,
-                                          hidden.shape[-2] if self.name == "attention" else None)
+                kernel = self._new_kernel(
+                    layer, hidden.shape[-1], hidden.device, hidden.dtype,
+                    hidden.shape[-2] if self.name == "attention" else None,
+                    initial_unembedding=initial_unembedding, initial_bias=initial_bias,
+                )
             if self.name == "jacobian":
                 site = self.probe.spec.residuals[layer]
                 final_site = self.probe.spec.residuals[max(self.probe.spec.residuals)]
@@ -108,6 +128,18 @@ class FittedLensProbe(LensProbe):
                 self.losses[layer] = kernel.fit(hidden, trace.logits, mask=mask, **kwargs)
             self.kernels[layer] = kernel
         return self
+
+    @model_eval
+    def fit_batches(self, train_inputs, validation_inputs, directory, **kwargs):
+        """Calibrate on independent input iterables with persistent Adam.
+
+        Capture once into CPU memory, train minibatches, select by held-out KL,
+        and save resumable optimizer state plus normal layer-bound artifacts.
+        Tuned/Attention Lens only. Inspect ``training_history`` afterwards.
+        Use explicit immutable identities in ``binding`` and disjoint examples.
+        """
+        from ..training.model_bound import fit_model_bound_lens
+        return fit_model_bound_lens(self, train_inputs, validation_inputs, directory, **kwargs)
 
     def save(self, directory):
         # All validation precedes filesystem writes.

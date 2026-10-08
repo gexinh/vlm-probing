@@ -36,6 +36,6 @@ Returns a `ProbeResult`: `relevance[B,T,T]`, `layer_relevance[L,B,T,T]`, and `we
 
 Works with frozen model parameters by starting an activation graph at the declared embedding site. Requires eager attention; Qwen3.5-4B is unsupported. Implements the self-attention recurrence, not the full multimodal/cross-attention Chefer algorithm or LRP.
 
-[Paper / source reference](../REFERENCES.md#relevance) ·
+[Paper / source reference](../REFERENCES.md#attention-methods) ·
 [Tensor implementation](../../src/vlm_probing/attention/relevance.py) ·
 [Shared result conventions](README.md#shared-conventions)
