@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">VLM Probing icon</title>
+  <desc id="desc">Visual tokens pass through a lens into a highlighted probing point.</desc>
+  <defs>
+    <linearGradient id="bg" x1="52" y1="36" x2="460" y2="476" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#152443"/>
+      <stop offset="1" stop-color="#081225"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="102" y1="140" x2="414" y2="363" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#33D6D0"/>
+      <stop offset="0.52" stop-color="#62A8FF"/>
+      <stop offset="1" stop-color="#9B7CFF"/>
+    </linearGradient>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="13"/>
+    </filter>
+  </defs>
+  <rect x="20" y="20" width="472" height="472" rx="112" fill="url(#bg)"/>
+  <rect x="21.5" y="21.5" width="469" height="469" rx="110.5" fill="none" stroke="#2B4267" stroke-width="3"/>
+
+  <g opacity=".28" stroke="#8BA2C9" stroke-width="2">
+    <path d="M104 130H408"/><path d="M104 382H408"/>
+    <path d="M104 130V382"/><path d="M408 130V382"/>
+  </g>
+
+  <g fill="none" stroke="url(#accent)" stroke-linecap="round">
+    <path d="M151 186C202 186 206 229 247 238" stroke-width="13"/>
+    <path d="M151 256H231" stroke-width="13"/>
+    <path d="M151 326C202 326 206 283 247 274" stroke-width="13"/>
+  </g>
+
+  <g fill="#D7E8FF">
+    <rect x="100" y="163" width="48" height="48" rx="12"/>
+    <rect x="100" y="232" width="48" height="48" rx="12" opacity=".82"/>
+    <rect x="100" y="301" width="48" height="48" rx="12" opacity=".64"/>
+  </g>
+
+  <circle cx="283" cy="256" r="85" fill="#122341" stroke="url(#accent)" stroke-width="16"/>
+  <circle cx="283" cy="256" r="49" fill="none" stroke="#D8E7FF" stroke-width="9" opacity=".92"/>
+  <path d="M343 316L406 379" fill="none" stroke="url(#accent)" stroke-width="23" stroke-linecap="round"/>
+
+  <circle cx="283" cy="256" r="17" fill="#54E0D2" opacity=".5" filter="url(#glow)"/>
+  <circle cx="283" cy="256" r="13" fill="#EAF8FF"/>
+  <path d="M283 224V288M251 256H315" stroke="#63DCD6" stroke-width="7" stroke-linecap="round"/>
+</svg>
+
