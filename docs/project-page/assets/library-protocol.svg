@@ -1,0 +1,198 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="660" viewBox="0 100 1600 660" role="img" aria-labelledby="figure-title figure-description">
+  <title id="figure-title">VLM Probing: from model inputs to reproducible analysis</title>
+  <desc id="figure-description">An editable four-stage library overview. Model inputs and optional paired examples are bound through Prober and an explicit adapter. Site selection, token groups, target scores and optional lens calibration configure three tool families. Lens readouts, attention attribution and causal experiments produce structured results and reproducible experiment artifacts. Method availability depends on adapter capabilities.</desc>
+  <metadata id="draft-metadata">Report figure 1; version 3; simplified output descriptions. The three miniature visualizations are schematic and contain no experimental measurements. Native editable SVG text and shapes. Palette follows docs/assets/library-overview.svg.</metadata>
+  <defs>
+    <linearGradient id="input-model-fill" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#152443"/><stop offset="1" stop-color="#081225"/>
+    </linearGradient>
+    <marker id="flow-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0 0L7 3.5L0 7Z" fill="#7183A0"/>
+    </marker>
+    <style>
+      text { font-family: "DejaVu Sans", "Arial", sans-serif; fill: #10213B; }
+      .title { font-size: 32px; font-weight: 700; }
+      .subtitle { font-size: 21px; fill: #53627A; }
+      .stage { font-size: 25px; font-weight: 700; }
+      .heading { font-size: 25px; font-weight: 700; }
+      .label { font-size: 22px; font-weight: 600; }
+      .body { font-size: 21px; fill: #53627A; }
+      .small { font-size: 19px; fill: #62708A; }
+      .role { font-size: 18px; font-weight: 600; }
+      .code { font-family: "DejaVu Sans Mono", monospace; font-size: 19px; fill: #10213B; }
+      .flow { fill: none; stroke: #7183A0; stroke-width: 2.5; stroke-linejoin: round; }
+      .card { fill: #FFFFFF; stroke: #DCE5F1; stroke-width: 1.8; }
+      .separator { stroke: #DCE5F1; stroke-width: 1.5; }
+      .optional { fill: #F8FAFE; stroke: #9DAFC7; stroke-width: 1.6; stroke-dasharray: 5 4; }
+    </style>
+  </defs>
+
+  <rect id="canvas" width="1600" height="760" fill="#FFFFFF"/>
+  <g id="stage-labels">
+    <text x="32" y="137" class="stage">1  Input</text>
+    <text x="300" y="137" class="stage">2  Configure</text>
+    <text x="636" y="137" class="stage">3  Tools</text>
+    <text x="1242" y="137" class="stage">4  Output</text>
+  </g>
+
+  <!-- Connectors are independent editable paths, behind every card. -->
+  <g id="pipeline-connectors" class="flow">
+    <path id="input-to-configure" d="M252 452H290" marker-end="url(#flow-arrow)"/>
+    <path id="configure-to-branch" d="M586 452H611"/>
+    <path id="tool-branch-trunk" d="M611 252V652"/>
+    <path id="branch-to-lens" d="M611 252H626" marker-end="url(#flow-arrow)"/>
+    <path id="branch-to-attention" d="M611 452H626" marker-end="url(#flow-arrow)"/>
+    <path id="branch-to-causal" d="M611 652H626" marker-end="url(#flow-arrow)"/>
+    <path id="lens-to-output-trunk" d="M1196 252H1218"/>
+    <path id="attention-to-output-trunk" d="M1196 452H1218"/>
+    <path id="causal-to-output-trunk" d="M1196 652H1218"/>
+    <path id="output-trunk" d="M1218 252V652"/>
+    <path id="trunk-to-output" d="M1218 452H1232" marker-end="url(#flow-arrow)"/>
+  </g>
+
+  <g id="input-stage">
+    <rect x="32" y="163" width="220" height="578" rx="14" class="card"/>
+    <text x="50" y="198" class="label">Loaded model</text>
+    <rect x="50" y="218" width="184" height="78" rx="10" fill="url(#input-model-fill)"/>
+    <g id="model-token-symbol" fill="#D7E8FF" stroke="#63DCD6" stroke-width="1.4">
+      <rect x="65" y="233" width="18" height="18" rx="3"/><rect x="65" y="263" width="18" height="18" rx="3"/>
+      <rect x="99" y="243" width="18" height="18" rx="3"/><rect x="133" y="243" width="18" height="18" rx="3"/>
+      <path d="M83 242L99 252M83 272L99 252M117 252H133M151 252H169" fill="none"/>
+      <circle cx="178" cy="252" r="10" fill="#63DCD6"/>
+    </g>
+    <text x="50" y="327" class="body">VLM · LLM · ViT</text>
+
+    <g id="illustrative-image">
+      <rect x="50" y="351" width="184" height="102" rx="8" fill="#EBF6FF"/>
+      <circle cx="207" cy="373" r="10" fill="#FFD270"/>
+      <path d="M50 420L91 382L120 410L151 383L234 438V453H50Z" fill="#4BC6B9"/>
+      <path d="M50 442L108 408L145 430L187 401L234 438V453H50Z" fill="#407EEB" opacity=".78"/>
+      <rect x="92" y="387" width="54" height="50" rx="3" fill="none" stroke="#10213B" stroke-width="1.5" stroke-dasharray="4 3"/>
+    </g>
+    <text x="50" y="484" class="body">Image and/or text</text>
+    <text x="50" y="514" class="small">Question / prompt</text>
+
+    <g id="optional-paired-input">
+      <rect x="50" y="548" width="184" height="132" rx="8" class="optional"/>
+      <text x="62" y="575" class="small">Optional pair</text>
+      <rect x="63" y="596" width="17" height="17" rx="3" fill="#17BEBB"/>
+      <text x="89" y="610" class="small">Base / clean</text>
+      <rect x="63" y="637" width="17" height="17" rx="3" fill="#8259E8"/>
+      <text x="89" y="651" class="small">Reference input</text>
+    </g>
+    <text x="50" y="718" class="small">Native model inputs</text>
+  </g>
+
+  <g id="configure-stage">
+    <rect x="300" y="163" width="286" height="578" rx="14" class="card"/>
+    <path d="M314 163H572Q586 163 586 177V217H300V177Q300 163 314 163Z" fill="#122642"/>
+    <text x="320" y="197" class="heading" style="fill:#F5FAFF">Prober + adapter</text>
+    <text x="320" y="249" class="code">Prober(model)</text>
+    <text x="320" y="278" class="code">probe.describe()</text>
+    <line x1="320" y1="297" x2="566" y2="297" class="separator"/>
+    <text x="320" y="328" class="label">Available sites</text>
+    <text x="320" y="356" class="body">Layers · heads · Q/K/V</text>
+    <text x="320" y="395" class="label">Token groups</text>
+    <text x="320" y="423" class="body">Visual · text · prediction</text>
+    <text x="320" y="462" class="label">Target score</text>
+    <text x="320" y="490" class="body">Token / class / margin</text>
+    <text x="320" y="527" class="code">.run(inputs, ...)</text>
+    <g id="optional-lens-calibration">
+      <rect x="320" y="557" width="246" height="149" rx="8" class="optional"/>
+      <text x="333" y="586" class="label">Optional fit / load</text>
+      <text x="333" y="616" class="body">Calibrated lenses</text>
+      <text x="333" y="645" class="small">Train + held-out inputs</text>
+      <text x="333" y="674" class="small">Save / load an artifact</text>
+    </g>
+    <text x="320" y="729" class="small">Check capabilities first</text>
+  </g>
+
+  <g id="lens-tools">
+    <rect x="636" y="163" width="560" height="178" rx="14" fill="#F7FCFB" stroke="#B9E5DE" stroke-width="1.8"/>
+    <rect x="636" y="183" width="5" height="138" rx="2" fill="#17BEBB"/>
+    <text x="657" y="196" class="heading">Lens</text>
+    <text x="657" y="221" class="role" style="fill:#127D79">Readout · optional calibrated decoder</text>
+    <text x="657" y="261" class="body">Logit · Tuned · Jacobian</text>
+    <text x="657" y="291" class="body">Attention Lens · EmbedLens</text>
+    <text x="657" y="324" class="body">Patchscope</text>
+    <g id="schematic-layer-token-readout">
+      <rect x="1046" y="216" width="126" height="89" rx="4" fill="#FFFFFF" stroke="#DCE5F1"/>
+      <g stroke="#FFFFFF" stroke-width="2">
+        <path d="M1049 219H1077V235H1049Z" fill="#D6F2ED"/><path d="M1079 219H1107V235H1079Z" fill="#B0E6DE"/><path d="M1109 219H1137V235H1109Z" fill="#D6F2ED"/><path d="M1139 219H1169V235H1139Z" fill="#E7F7F4"/>
+        <path d="M1049 236H1077V252H1049Z" fill="#90DBCF"/><path d="M1079 236H1107V252H1079Z" fill="#59C8B9"/><path d="M1109 236H1137V252H1109Z" fill="#B0E6DE"/><path d="M1139 236H1169V252H1139Z" fill="#D6F2ED"/>
+        <path d="M1049 253H1077V269H1049Z" fill="#59C8B9"/><path d="M1079 253H1107V269H1079Z" fill="#159F99"/><path d="M1109 253H1137V269H1109Z" fill="#90DBCF"/><path d="M1139 253H1169V269H1139Z" fill="#B0E6DE"/>
+        <path d="M1049 270H1077V286H1049Z" fill="#B0E6DE"/><path d="M1079 270H1107V286H1079Z" fill="#087D7A"/><path d="M1109 270H1137V286H1109Z" fill="#59C8B9"/><path d="M1139 270H1169V286H1139Z" fill="#90DBCF"/>
+        <path d="M1049 287H1077V302H1049Z" fill="#D6F2ED"/><path d="M1079 287H1107V302H1079Z" fill="#087D7A"/><path d="M1109 287H1137V302H1109Z" fill="#B0E6DE"/><path d="M1139 287H1169V302H1139Z" fill="#D6F2ED"/>
+      </g>
+      <text x="1109" y="329" class="small" text-anchor="middle">Layer–token map</text>
+    </g>
+  </g>
+
+  <g id="attention-tools">
+    <rect x="636" y="363" width="560" height="178" rx="14" fill="#F7FAFF" stroke="#CADDF9" stroke-width="1.8"/>
+    <rect x="636" y="383" width="5" height="138" rx="2" fill="#4C8DF6"/>
+    <text x="657" y="396" class="heading">Attention</text>
+    <text x="657" y="421" class="role" style="fill:#326EBF">Observation · target-score attribution</text>
+    <text x="657" y="454" class="body">Rollout · Grad-CAM · ATTATTR</text>
+    <text x="657" y="482" class="body">TAM · Beyond Intuition</text>
+    <text x="657" y="510" class="body">DTD/LRP</text>
+    <g id="schematic-attribution-map">
+      <rect x="1046" y="416" width="126" height="89" rx="4" fill="#EAF2FF" stroke="#DCE5F1"/>
+      <path d="M1047 479L1079 448L1106 478L1132 439L1171 483V504H1047Z" fill="#C4D6EE"/>
+      <g fill="#4C8DF6">
+        <rect x="1099" y="433" width="17" height="17" opacity=".25"/><rect x="1118" y="433" width="17" height="17" opacity=".55"/><rect x="1137" y="433" width="17" height="17" opacity=".25"/>
+        <rect x="1099" y="452" width="17" height="17" opacity=".55"/><rect x="1118" y="452" width="17" height="17" opacity=".95"/><rect x="1137" y="452" width="17" height="17" opacity=".55"/>
+        <rect x="1099" y="471" width="17" height="17" opacity=".25"/><rect x="1118" y="471" width="17" height="17" opacity=".55"/><rect x="1137" y="471" width="17" height="17" opacity=".25"/>
+      </g>
+      <text x="1109" y="529" class="small" text-anchor="middle">Attribution map</text>
+    </g>
+  </g>
+
+  <g id="causal-tools">
+    <rect x="636" y="563" width="560" height="178" rx="14" fill="#FAF8FF" stroke="#D9CFF5" stroke-width="1.8"/>
+    <rect x="636" y="583" width="5" height="138" rx="2" fill="#8259E8"/>
+    <text x="657" y="596" class="heading">Causal</text>
+    <text x="657" y="621" class="role" style="fill:#6A42BB">Intervention · attribution estimates</text>
+    <text x="657" y="654" class="body">Activation / path patching</text>
+    <text x="657" y="682" class="body">Knockout · Steering</text>
+    <text x="657" y="710" class="body">Attribution / EAP-IG estimates</text>
+    <g id="schematic-intervention-delta">
+      <line x1="1051" y1="646" x2="1170" y2="646" stroke="#7183A0" stroke-width="1.5"/>
+      <line x1="1051" y1="625" x2="1051" y2="704" stroke="#7183A0" stroke-width="1.5"/>
+      <rect x="1062" y="646" width="14" height="15" rx="1.5" fill="#B29AE9"/>
+      <rect x="1085" y="646" width="14" height="24" rx="1.5" fill="#9E7FE2"/>
+      <rect x="1108" y="646" width="14" height="46" rx="1.5" fill="#8259E8"/>
+      <rect x="1131" y="630" width="14" height="16" rx="1.5" fill="#4C8DF6"/>
+      <rect x="1154" y="646" width="14" height="9" rx="1.5" fill="#C7B6F0"/>
+      <text x="1109" y="729" class="small" text-anchor="middle">Score changes</text>
+    </g>
+  </g>
+
+  <g id="output-stage">
+    <rect x="1242" y="163" width="326" height="578" rx="14" class="card"/>
+    <text x="1262" y="198" class="heading">Structured outputs</text>
+    <text x="1262" y="248" class="label">Readouts</text>
+    <text x="1262" y="277" class="body">Layer / head token scores</text>
+    <text x="1262" y="331" class="label">Attribution</text>
+    <text x="1262" y="360" class="body">Maps and effect estimates</text>
+    <text x="1262" y="414" class="label">Interventions</text>
+    <text x="1262" y="443" class="body">Changes in answer scores</text>
+    <text x="1262" y="471" class="body">Changes in generated text</text>
+    <line x1="1262" y1="500" x2="1548" y2="500" class="separator"/>
+    <text x="1262" y="534" class="label">Experiment archive</text>
+    <circle cx="1267" cy="563" r="2.6" fill="#53627A"/>
+    <text x="1280" y="569" class="body" style="font-size:19px">Input examples</text>
+    <circle cx="1267" cy="591" r="2.6" fill="#53627A"/>
+    <text x="1280" y="597" class="body" style="font-size:19px">Model and method settings</text>
+    <circle cx="1267" cy="619" r="2.6" fill="#53627A"/>
+    <text x="1280" y="625" class="body" style="font-size:19px">Analysis results</text>
+    <circle cx="1267" cy="647" r="2.6" fill="#53627A"/>
+    <text x="1280" y="653" class="body" style="font-size:19px">Figures and plots</text>
+    <circle cx="1267" cy="675" r="2.6" fill="#53627A"/>
+    <text x="1280" y="681" class="body" style="font-size:19px">Example notebooks</text>
+    <circle cx="1267" cy="703" r="2.6" fill="#53627A"/>
+    <text x="1280" y="709" class="body" style="font-size:19px">Fitted lenses when needed</text>
+  </g>
+
+</svg>
+
