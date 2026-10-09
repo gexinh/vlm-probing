@@ -6,6 +6,10 @@
 
 <p align="center"><strong>Exploring Model Internals Beyond the Answer</strong></p>
 
+<p align="center">
+  <a href="https://gexinh.github.io/vlm-probing/"><img src="https://img.shields.io/badge/Project%20Page-Visit%20Website-3266e5?style=for-the-badge" alt="Visit the VLM Probing project page"></a>
+</p>
+
 VLM Probing brings lens readouts, attention explanations, and causal
 interventions into one model-bound interface. It supports vision-language
 models, language models, and a ViT image-classification control. Bind a loaded
@@ -29,7 +33,7 @@ a measured zero effect.
   <img src="docs/assets/library-protocol.svg" width="100%" alt="Model inputs, adapter configuration, lens/attention/causal tools, and structured results">
 </p>
 
-[Documentation](docs/README.md) · [Demos](demos/README.md) ·
+[Project Page](https://gexinh.github.io/vlm-probing/) · [Documentation](docs/README.md) · [Demos](demos/README.md) ·
 [Visualization](docs/VISUALIZATION.md) ·
 [Technical report](https://github.com/gexinh/vlm-probing/releases/latest/download/vlm-probing-technical-report.pdf) ·
 [Papers and datasets](docs/REFERENCES.md)

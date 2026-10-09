@@ -1,0 +1,51 @@
+name: Deploy project page
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/project-page/**'
+      - '.github/workflows/deploy-project-page.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Prepare the static project page
+        run: |
+          mkdir -p _site
+          cp docs/project-page/index.html docs/project-page/styles.css docs/project-page/app.js _site/
+          cp -R docs/project-page/assets _site/assets
+          touch _site/.nojekyll
+          test -s _site/index.html
+          test -s _site/assets/experiment.json
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

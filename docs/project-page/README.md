@@ -23,9 +23,41 @@ Open http://127.0.0.1:8765/. Use HTTP rather than opening index.html directly be
 
 ## GitHub Pages
 
-The page uses relative asset paths and works at a GitHub Pages project URL. For a separate page repository, copy the contents of docs/project-page into the repository root and enable Pages using a branch with the root directory as its source. Keep the research repository private unless the team decides otherwise.
+Project URL: https://gexinh.github.io/vlm-probing/
 
-An existing private repository can also host the page if its account/plan supports Pages; administration access is needed to configure it. A public page reveals its HTML, JavaScript, diagrams, and extracted measurement numbers even if the research repository is private. Confirm the public presentation content with the team before enabling public hosting.
+The repository README includes a Project Page badge and text link to this URL.
+The workflow at .github/workflows/deploy-project-page.yml publishes this folder
+at the site root, so styles, JavaScript, SVGs, and JSON use the same relative paths.
+
+### One-time setup (repository administrator)
+
+1. Open repository Settings → Pages.
+2. Under Build and deployment, choose **GitHub Actions** as the Source.
+3. Open Actions → Deploy project page → Run workflow on **main**.
+4. Wait for both build and deploy to succeed, then use **Visit site** in Pages settings.
+5. In the repository About panel, set Website to https://gexinh.github.io/vlm-probing/.
+
+Subsequent changes to this folder on main publish automatically.
+The workflow uploads only index.html, styles.css, app.js, and assets;
+Python source, notebooks, model weights, and the rest of the private repository
+are not part of the website artifact.
+
+Private repositories require an eligible GitHub plan for Pages. If Pages settings
+offer only an upgrade or public-repository option, keep this research repository
+private and use a separate public page repository containing the site assets,
+then update the README links to that repository's Pages URL.
+
+A published page exposes its HTML, JavaScript, diagrams, and displayed experiment
+numbers. Repository, documentation, notebooks, and technical report links still
+require repository access while the research repository is private.
+
+### Verification
+
+Visit the Project Page badge from the repository README. Confirm that the
+framework image loads, route selection and layer changes update the archived
+experiment, and Copy code works. If deployment succeeds but the site returns 404,
+allow up to ten minutes for publication and check the Pages URL and workflow
+deployment environment.
 
 ## Provenance and scope
 
